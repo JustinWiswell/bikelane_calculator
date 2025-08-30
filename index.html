@@ -214,38 +214,52 @@
       const totalLifetimeBenefit = lifetimeCyclistSavings + lifetimeHealthCostReduction;
 
       document.getElementById('output').innerHTML = `
-        <div class="faq-card">
-          <h3><span class="question-icon">💡</span>How many regular cyclists would the city need to return $${investment.toLocaleString()} in the form of personal savings to regular cyclists?</h3>
-          <p><strong>Answer:</strong> If the city invested $${investment.toLocaleString()} and attracted ${Math.round(cyclistsFinancial).toLocaleString()} regular cyclists, each saving $${savings.toLocaleString()} annually, the combined personal savings of those regular cyclists over ${years.toLocaleString()} years would be <span class="highlight">$${totalCyclistSavings.toLocaleString()}</span>.</p>
-          <p class="formula"><em>Formula: INVESTMENT ÷ (SAVINGS × YEARS) = ${investment.toLocaleString()} ÷ (${savings.toLocaleString()} × ${years.toLocaleString()})</em></p>
-        </div>
+       <div class="faq-card">
+  <h3><span class="question-icon">💡</span>How many regular cyclists would the city need to return $${investment.toLocaleString()} in the form of personal savings to regular cyclists?</h3>
+  <p><strong>Answer:</strong> If the city invested <span class="highlight">$${investment.toLocaleString()}</span> and attracted <span class="highlight">${Math.round(cyclistsFinancial).toLocaleString()}</span> regular cyclists, each saving <span class="highlight">$${savings.toLocaleString()}</span> annually, the combined personal savings over <span class="highlight">${years.toLocaleString()}</span> years would be <span class="highlight">$${totalCyclistSavings.toLocaleString()}</span>.</p>
+  <p class="formula"><em>Formula: Cyclist Count = Investment ÷ (Annual Savings × Years)</em></p>
+</div>
 
-        <div class="faq-card">
-          <h3><span class="question-icon">❤️</span>The highest quality studies indicate that for every $1 spent on bikelanes, $${multiplier} in health costs are reduced (over ${lifetimeYears} years)<sup><a href="#note1">1</a></sup>. How much would Provincial health care costs reduce over ${years.toLocaleString()} years?</h3>
-          <p><strong>Answer:</strong> Over ${years.toLocaleString()} years, the initial investment of $${investment.toLocaleString()} is projected to reduce Provincial health care costs by approximately <span class="highlight">$${periodHealthCostReduction.toLocaleString()}</span>, based on an annual saving of <span class="highlight">$${annualHealthCostReduction.toLocaleString()}</span> and a total lifetime saving of <span class="highlight">$${lifetimeHealthCostReduction.toLocaleString()}</span> over ${lifetimeYears} years.</p>
-          <p class="formula"><em>Formula: LIFETIME = INVESTMENT × MULTIPLIER; ANNUAL = LIFETIME ÷ LIFETIME_YEARS; PERIOD = ANNUAL × YEARS</em></p>
-        </div>
 
-        <div class="faq-card">
-          <h3><span class="question-icon">📊</span>What is the total personal financial benefit to regular cyclists + reduction in Provincial health care spending (over ${years.toLocaleString()} years)?</h3>
-          <p><strong>Answer:</strong> 📈 Total ${years.toLocaleString()}‑year economic return: <span class="highlight">$${totalBenefit.toLocaleString()}</span></p>
-          <ul>
-            <li class="personal">Personal financial benefit to regular cyclists: <span class="highlight">$${totalCyclistSavings.toLocaleString()}</span></li>
-            <li class="health">Reduction in Provincial health care spending: <span class="highlight">$${periodHealthCostReduction.toLocaleString()}</span></li>
-          </ul>
-          <p class="formula"><em>Formula: TOTAL = PERSONAL_BENEFIT + PROVINCIAL_HEALTH_CARE_REDUCTION = ${totalCyclistSavings.toLocaleString()} + ${periodHealthCostReduction.toLocaleString()}</em></p>
-        </div>
+     <div class="faq-card">
+  <h3><span class="question-icon">❤️</span>How much would Provincial health care costs reduce over ${years.toLocaleString()} years, based on a $${multiplier} return per $1 invested?</h3>
+  <p><strong>Answer:</strong> Over <span class="highlight">${years.toLocaleString()}</span> years, the initial investment of <span class="highlight">$${investment.toLocaleString()}</span> is projected to reduce health care costs by <span class="highlight">$${periodHealthCostReduction.toLocaleString()}</span>, based on an annual saving of <span class="highlight">$${annualHealthCostReduction.toLocaleString()}</span> and a total lifetime saving of <span class="highlight">$${lifetimeHealthCostReduction.toLocaleString()}</span> over <span class="highlight">${lifetimeYears}</span> years.</p>
+  <p class="formula"><em>Formula: Lifetime Savings = Investment × Multiplier</em></p>
+  <p class="formula"><em>Formula: Annual Savings = Lifetime Savings ÷ Lifetime Years</em></p>
+  <p class="formula"><em>Formula: Period Savings = Annual Savings × Years</em></p>
+</div>
 
-        <div class="faq-card">
-          <h3><span class="question-icon">🏆</span>What is the total personal financial benefit to regular cyclists + reduction in Provincial health care spending (over ${lifetimeYears} years)?</h3>
-          <p><strong>Answer:</strong> 📈 Total ${lifetimeYears}‑year economic return: <span class="highlight">$${totalLifetimeBenefit.toLocaleString()}</span></p>
-          <ul>
-            <li><strong>Initial investment amount:</strong> <span class="highlight">$${investment.toLocaleString()}</span></li>
-            <li class="personal">Personal financial benefit to regular cyclists: <span class="highlight">$${lifetimeCyclistSavings.toLocaleString()}</span></li>
-            <li class="health">Reduction in Provincial health care spending: <span class="highlight">$${lifetimeHealthCostReduction.toLocaleString()}</span></li>
-          </ul>
-          <p class="formula"><em>Formula: TOTAL_LIFETIME = PERSONAL_LIFETIME_BENEFIT + PROVINCIAL_LIFETIME_HEALTH_CARE_REDUCTION = ${lifetimeCyclistSavings.toLocaleString()} + ${lifetimeHealthCostReduction.toLocaleString()}</em></p>
-        </div>
+
+   <div class="faq-card">
+  <h3><span class="question-icon">📊</span>What is the total personal financial benefit to regular cyclists + reduction in health care spending (over ${years.toLocaleString()} years)?</h3>
+  <p><strong>Answer:</strong> 📈 Total ${years.toLocaleString()}‑year economic return: <span class="highlight">$${totalBenefit.toLocaleString()}</span></p>
+  <ul>
+    <li class="personal">Cyclist savings: <span class="highlight">$${totalCyclistSavings.toLocaleString()}</span></li>
+    <li class="health">Health care savings: <span class="highlight">$${periodHealthCostReduction.toLocaleString()}</span></li>
+  </ul>
+  <p class="formula"><em>Formula: Total Benefit = Cyclist Savings + Health Care Savings</em></p>
+</div>
+
+
+<div class="faq-card">
+  <h3><span class="question-icon">🏆</span>What is the total personal financial benefit to regular cyclists + reduction in health care spending (over ${lifetimeYears} years)?</h3>
+  <p><strong>Answer:</strong> 📈 Total ${lifetimeYears}-year economic return: <span class="highlight">$${totalLifetimeBenefit.toLocaleString()}</span></p>
+  <ul>
+  <li><strong>Initial investment:</strong> <span class="highlight">$${investment.toLocaleString()}</span></li>
+  <li><strong>Cyclist savings:</strong> <span class="highlight">$${lifetimeCyclistSavings.toLocaleString()}</span></li>
+  <li><strong>Health care savings:</strong> <span class="highlight">$${lifetimeHealthCostReduction.toLocaleString()}</span></li>
+</ul>
+  <p><strong>Net benefit:</strong> <span class="highlight">$${(totalLifetimeBenefit - investment).toLocaleString()}</span></p>
+  <p><strong>Return on investment (ROI):</strong> <span class="highlight">${((totalLifetimeBenefit - investment) / investment).toFixed(1)}x</span></p>
+  <p><strong>Per-dollar impact:</strong> For every $1 invested, the province sees <span class="highlight">$${(totalLifetimeBenefit / investment).toFixed(1)}</span> in combined economic benefit.</p>
+  <p class="formula"><em>Formula: Total Benefit = Cyclist Savings + Health Care Savings</em></p>
+  <p class="formula"><em>Formula: Net Benefit = Total Benefit − Investment</em></p>
+  <p class="formula"><em>Formula: ROI = Net Benefit ÷ Investment</em></p>
+</div>
+
+
+
+
 
         <p class="note" id="note1">
           *Note<sup>1</sup>: The $${multiplier} figure is based on total health care savings over the assumed ${lifetimeYears}‑year lifetime of the infrastructure, as reported in 
