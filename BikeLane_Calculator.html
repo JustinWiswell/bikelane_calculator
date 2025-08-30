@@ -59,14 +59,20 @@
     }
     table {
       width: 100%;
+      max-width: 100%;
       border-collapse: collapse;
       margin-top: 20px;
+      display: block;          /* allows horizontal scrolling */
+      overflow-x: auto;
+      white-space: nowrap;     /* prevents awkward breaks */
     }
     th, td {
       border: 1px solid #ccc;
       padding: 10px;
       text-align: left;
       vertical-align: top;
+      word-wrap: break-word;
+      white-space: normal;     /* allows wrapping inside cells */
     }
     th {
       background-color: var(--primary);
@@ -192,7 +198,7 @@
             </td>
           </tr>
         </table>
-        <p class="note">
+      <p class="note">
           *Note<sup>1</sup>: The $${multiplier} figure is based on total health care savings over the assumed ${lifetimeYears}-year lifetime of the infrastructure, as reported in <a href="https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0246419" target="_blank">peer‑reviewed studies</a>. The ${years}-year figure shown here is a proportional estimate for illustration.*
         </p>
       `;
