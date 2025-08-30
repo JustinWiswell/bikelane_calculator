@@ -10,7 +10,6 @@
       --accent: #f4f4f4;
       --text: #333;
     }
-    /* ✅ Global box-sizing fix */
     *, *::before, *::after {
       box-sizing: border-box;
     }
@@ -45,6 +44,28 @@
       margin-top: 15px;
       font-weight: bold;
     }
+    .input-dollar {
+      position: relative;
+      display: inline-block;
+      width: 100%;
+    }
+    .input-dollar::before {
+      content: "$";
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #555;
+      font-size: 1em;
+    }
+    .input-dollar input {
+      padding-left: 25px;
+      width: 100%;
+    }
+    .input-full {
+      display: inline-block;
+      width: 100%;
+    }
     input {
       width: 100%;
       padding: 10px;
@@ -67,22 +88,44 @@
     button:hover {
       background-color: #246b45;
     }
-    table {
-      width: 100%;
-      border-collapse: collapse;
+
+    .faq-card {
+      background-color: #fafafa;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      padding: 15px;
+      margin-bottom: 15px;
+      animation: fadeIn 0.6s ease-in-out;
+    }
+    #output .faq-card:first-child {
       margin-top: 20px;
-      table-layout: fixed; /* ✅ keeps table within container */
     }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 10px;
-      text-align: left;
-      vertical-align: top;
-      word-wrap: break-word; /* ✅ wrap long text */
+    .faq-card:nth-child(even) {
+      background-color: #f0f0f0;
     }
-    th {
-      background-color: var(--primary);
-      color: white;
+    .faq-card h3 {
+      margin-top: 0;
+      font-size: 1.1em;
+    }
+    .question-icon {
+      margin-right: 8px;
+      font-size: 1.2em;
+      color: var(--primary);
+    }
+
+    .highlight {
+      font-weight: bold;
+      color: #2e8b57;
+    }
+
+    .personal { color: #2e8b57; font-weight: bold; }
+    .health { color: #1e90ff; font-weight: bold; }
+    .total { color: #daa520; font-weight: bold; }
+
+    .formula {
+      font-size: 0.85em;
+      text-transform: uppercase;
+      color: #555;
     }
     .note {
       font-size: 0.9em;
@@ -96,10 +139,12 @@
     sup a:hover {
       text-decoration: underline;
     }
-    .formula {
-      font-size: 0.85em;
-      text-transform: uppercase;
-      color: #555;
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    p, li {
+      line-height: 1.5;
     }
   </style>
 </head>
@@ -107,19 +152,25 @@
   <div class="container">
     <h2>🚴 Cycling Investment Calculator</h2>
     <p class="summary">
-      This tool estimates the economic and health care benefits of investing in cycling infrastructure.  
-      Enter your investment amount, annual savings per cyclist, and time period to see projected personal savings,  
+      This tool estimates the economic and health care benefits of investing in cycling infrastructure.
+      Enter your investment amount, annual savings per cyclist, and time period to see projected personal savings,
       health care cost reductions, and total returns for regular cyclists.
     </p>
 
-    <label for="investment">Investment Amount ($):</label>
-    <input type="number" id="investment" value="1500000">
+    <label for="investment">Investment Amount:</label>
+    <div class="input-dollar">
+      <input type="text" id="investment" value="1,500,000" inputmode="numeric">
+    </div>
 
-    <label for="savings">Annual Savings per Cyclist ($):</label>
-    <input type="number" id="savings" value="4000">
+    <label for="savings">Annual Savings per Cyclist:</label>
+    <div class="input-dollar">
+      <input type="text" id="savings" value="4,000" inputmode="numeric">
+    </div>
 
     <label for="years">Years (for partial calculation):</label>
-    <input type="number" id="years" value="5">
+    <div class="input-full">
+      <input type="number" id="years" value="5" min="1">
+    </div>
 
     <button onclick="calculate()">Calculate</button>
 
@@ -127,15 +178,33 @@
   </div>
 
   <script>
+    function formatNumberWithCommas(value) {
+      const numericValue = value.replace(/\D/g, '');
+      if (!numericValue) return '';
+      return numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    }
+
+    ['investment', 'savings'].forEach(id => {
+      const input = document.getElementById(id);
+      input.addEventListener('input', (e) => {
+        const formatted = formatNumberWithCommas(e.target.value);
+        e.target.value = formatted;
+        e.target.setSelectionRange(e.target.value.length, e.target.value.length);
+      });
+      input.addEventListener('blur', (e) => {
+        e.target.value = formatNumberWithCommas(e.target.value);
+      });
+    });
+
     function calculate() {
-      const investment = parseFloat(document.getElementById('investment').value);
-      const savings = parseFloat(document.getElementById('savings').value);
-      const years = parseFloat(document.getElementById('years').value);
+      const investment = parseFloat(document.getElementById('investment').value.replace(/,/g, '')) || 0;
+      const savings = parseFloat(document.getElementById('savings').value.replace(/,/g, '')) || 0;
+      const years = parseFloat(document.getElementById('years').value) || 0;
 
       const multiplier = 3;
       const lifetimeYears = 20;
 
-      const cyclistsFinancial = investment / (savings * years);
+      const cyclistsFinancial = (savings > 0 && years > 0) ? (investment / (savings * years)) : 0;
       const totalCyclistSavings = cyclistsFinancial * savings * years;
       const lifetimeHealthCostReduction = investment * multiplier;
       const annualHealthCostReduction = lifetimeHealthCostReduction / lifetimeYears;
@@ -145,52 +214,43 @@
       const totalLifetimeBenefit = lifetimeCyclistSavings + lifetimeHealthCostReduction;
 
       document.getElementById('output').innerHTML = `
-        <table>
-          <tr>
-            <th>FAQs</th>
-          </tr>
-          <tr>
-            <td>
-              <p><strong>Question: How many regular cyclists would the city need to return $${investment.toLocaleString()} in the form of personal savings regular cyclists?</strong></p>
-              <p><strong>Answer:</strong> If the city invested $${investment.toLocaleString()} and attracted ${Math.round(cyclistsFinancial)} regular cyclists, each saving $${savings.toLocaleString()} annually, the combined personal savings of those regular cyclists over ${years} years would be $${totalCyclistSavings.toLocaleString()}.</p>
-              <p class="formula"><em>Formula: INVESTMENT ÷ (SAVINGS × YEARS) = ${investment} ÷ (${savings} × ${years})</em></p>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <p><strong>Question: The highest quality studies indicate that for every $1 spent on bikelanes, $${multiplier} in health costs are reduced (over ${lifetimeYears} years)<sup><a href="#note1">1</a></sup>. How much would Provincial health care costs reduce over ${years} years?</strong></p>
-              <p><strong>Answer:</strong> Over ${years} years, the initial investment of $${investment.toLocaleString()} is projected to reduce Provincial health care costs by approximately $${periodHealthCostReduction.toLocaleString()}, based on an annual saving of $${annualHealthCostReduction.toLocaleString()} and a total lifetime saving of $${lifetimeHealthCostReduction.toLocaleString()} over ${lifetimeYears} years.</p>
-              <p class="formula"><em>Formula: LIFETIME = INVESTMENT × MULTIPLIER; ANNUAL = LIFETIME ÷ LIFETIME_YEARS; PERIOD = ANNUAL × YEARS</em></p>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <p><strong>Question: What is the total personal financial benefit to regular cyclists + reduction in Provincial health care spending (over ${years} years)?</strong></p>
-              <p><strong>Answer:</strong> 📈 Total ${years}-year economic return: <strong>$${totalBenefit.toLocaleString()}</strong></p>
-              <ul>
-                <li>Personal financial benefit to regular cyclists (over ${years} years): $${totalCyclistSavings.toLocaleString()}</li>
-                <li>Reduction in Provincial health care spending (over ${years} years): $${periodHealthCostReduction.toLocaleString()}</li>
-              </ul>
-              <p class="formula"><em>Formula: TOTAL = PERSONAL_BENEFIT + PROVINCIAL_HEALTH_CARE_REDUCTION = ${totalCyclistSavings.toLocaleString()} + ${periodHealthCostReduction.toLocaleString()}</em></p>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <p><strong>Question: What is the total personal financial benefit to regular cyclists + reduction in Provincial health care spending (over ${lifetimeYears} years)?</strong></p>
-              <p><strong>Answer:</strong> 📈 Total ${lifetimeYears}-year economic return: <strong>$${totalLifetimeBenefit.toLocaleString()}</strong></p>
-              <ul>
-                <li><strong>Initial investment amount:</strong> $${investment.toLocaleString()}</li>
-                <li>Personal financial benefit to regular cyclists (over ${lifetimeYears} years): $${lifetimeCyclistSavings.toLocaleString()}</li>
-                <li>Reduction in Provincial health care spending (over ${lifetimeYears} years): $${lifetimeHealthCostReduction.toLocaleString()}</li>
-              </ul>
-              <p class="formula"><em>Formula: TOTAL_LIFETIME = PERSONAL_LIFETIME_BENEFIT + PROVINCIAL_LIFETIME_HEALTH_CARE_REDUCTION = ${lifetimeCyclistSavings.toLocaleString()} + ${lifetimeHealthCostReduction.toLocaleString()}</em></p>
-            </td>
-          </tr>
-        </table>
+        <div class="faq-card">
+          <h3><span class="question-icon">💡</span>How many regular cyclists would the city need to return $${investment.toLocaleString()} in the form of personal savings to regular cyclists?</h3>
+          <p><strong>Answer:</strong> If the city invested $${investment.toLocaleString()} and attracted ${Math.round(cyclistsFinancial).toLocaleString()} regular cyclists, each saving $${savings.toLocaleString()} annually, the combined personal savings of those regular cyclists over ${years.toLocaleString()} years would be <span class="highlight">$${totalCyclistSavings.toLocaleString()}</span>.</p>
+          <p class="formula"><em>Formula: INVESTMENT ÷ (SAVINGS × YEARS) = ${investment.toLocaleString()} ÷ (${savings.toLocaleString()} × ${years.toLocaleString()})</em></p>
+        </div>
+
+        <div class="faq-card">
+          <h3><span class="question-icon">❤️</span>The highest quality studies indicate that for every $1 spent on bikelanes, $${multiplier} in health costs are reduced (over ${lifetimeYears} years)<sup><a href="#note1">1</a></sup>. How much would Provincial health care costs reduce over ${years.toLocaleString()} years?</h3>
+          <p><strong>Answer:</strong> Over ${years.toLocaleString()} years, the initial investment of $${investment.toLocaleString()} is projected to reduce Provincial health care costs by approximately <span class="highlight">$${periodHealthCostReduction.toLocaleString()}</span>, based on an annual saving of <span class="highlight">$${annualHealthCostReduction.toLocaleString()}</span> and a total lifetime saving of <span class="highlight">$${lifetimeHealthCostReduction.toLocaleString()}</span> over ${lifetimeYears} years.</p>
+          <p class="formula"><em>Formula: LIFETIME = INVESTMENT × MULTIPLIER; ANNUAL = LIFETIME ÷ LIFETIME_YEARS; PERIOD = ANNUAL × YEARS</em></p>
+        </div>
+
+        <div class="faq-card">
+          <h3><span class="question-icon">📊</span>What is the total personal financial benefit to regular cyclists + reduction in Provincial health care spending (over ${years.toLocaleString()} years)?</h3>
+          <p><strong>Answer:</strong> 📈 Total ${years.toLocaleString()}‑year economic return: <span class="highlight">$${totalBenefit.toLocaleString()}</span></p>
+          <ul>
+            <li class="personal">Personal financial benefit to regular cyclists: <span class="highlight">$${totalCyclistSavings.toLocaleString()}</span></li>
+            <li class="health">Reduction in Provincial health care spending: <span class="highlight">$${periodHealthCostReduction.toLocaleString()}</span></li>
+          </ul>
+          <p class="formula"><em>Formula: TOTAL = PERSONAL_BENEFIT + PROVINCIAL_HEALTH_CARE_REDUCTION = ${totalCyclistSavings.toLocaleString()} + ${periodHealthCostReduction.toLocaleString()}</em></p>
+        </div>
+
+        <div class="faq-card">
+          <h3><span class="question-icon">🏆</span>What is the total personal financial benefit to regular cyclists + reduction in Provincial health care spending (over ${lifetimeYears} years)?</h3>
+          <p><strong>Answer:</strong> 📈 Total ${lifetimeYears}‑year economic return: <span class="highlight">$${totalLifetimeBenefit.toLocaleString()}</span></p>
+          <ul>
+            <li><strong>Initial investment amount:</strong> <span class="highlight">$${investment.toLocaleString()}</span></li>
+            <li class="personal">Personal financial benefit to regular cyclists: <span class="highlight">$${lifetimeCyclistSavings.toLocaleString()}</span></li>
+            <li class="health">Reduction in Provincial health care spending: <span class="highlight">$${lifetimeHealthCostReduction.toLocaleString()}</span></li>
+          </ul>
+          <p class="formula"><em>Formula: TOTAL_LIFETIME = PERSONAL_LIFETIME_BENEFIT + PROVINCIAL_LIFETIME_HEALTH_CARE_REDUCTION = ${lifetimeCyclistSavings.toLocaleString()} + ${lifetimeHealthCostReduction.toLocaleString()}</em></p>
+        </div>
+
         <p class="note" id="note1">
-          *Note<sup>1</sup>: The $${multiplier} figure is based on total health care savings over the assumed ${lifetimeYears}-year lifetime of the infrastructure, as reported in 
+          *Note<sup>1</sup>: The $${multiplier} figure is based on total health care savings over the assumed ${lifetimeYears}‑year lifetime of the infrastructure, as reported in 
           <a href="https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0246419" target="_blank">peer‑reviewed studies</a>. 
-          The ${years}-year figure shown here is a proportional estimate for illustration.*
+          The ${years.toLocaleString()}‑year figure shown here is a proportional estimate for illustration.*
         </p>
       `;
     }
