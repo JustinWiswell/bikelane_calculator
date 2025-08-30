@@ -32,6 +32,12 @@
     h2 {
       color: var(--primary);
       text-align: center;
+      margin-bottom: 10px;
+    }
+    .summary {
+      text-align: center;
+      font-size: 1em;
+      color: #555;
       margin-bottom: 20px;
     }
     label {
@@ -63,17 +69,16 @@
     }
     table {
       width: 100%;
-      max-width: 100%;
       border-collapse: collapse;
       margin-top: 20px;
-      display: block;
-      overflow-x: auto;
+      table-layout: fixed; /* ✅ keeps table within container */
     }
     th, td {
       border: 1px solid #ccc;
       padding: 10px;
       text-align: left;
       vertical-align: top;
+      word-wrap: break-word; /* ✅ wrap long text */
     }
     th {
       background-color: var(--primary);
@@ -101,6 +106,11 @@
 <body>
   <div class="container">
     <h2>🚴 Cycling Investment Calculator</h2>
+    <p class="summary">
+      This tool estimates the economic and health care benefits of investing in cycling infrastructure.  
+      Enter your investment amount, annual savings per cyclist, and time period to see projected personal savings,  
+      health care cost reductions, and total returns for regular cyclists.
+    </p>
 
     <label for="investment">Investment Amount ($):</label>
     <input type="number" id="investment" value="1500000">
