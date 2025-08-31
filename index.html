@@ -66,6 +66,7 @@
       outline: none;
       margin-top: 0.5rem;
       margin-bottom: 0.5rem;
+      display: block;
     }
 
     input[type="range"]::-webkit-slider-thumb {
@@ -86,22 +87,20 @@
       cursor: pointer;
       border: none;
     }
-.card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 0.75rem 1rem 1rem 1rem; /* top right bottom left */
-  margin: 0.5rem 0 1rem 0;         /* top right bottom left */
-}
-.card h2 {
-  margin-top: 0;
-}
 
-
-    .card h2 {
-      font-size: 1.1rem;
-      margin-bottom: 0.5rem;
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      margin: 0.5rem 0;
     }
+
+   .card h2 {
+  font-size: 1.1rem;
+  margin: 0.25rem 0 0.5rem 0; /* top right bottom left */
+  padding: 0; /* ensure no padding sneaks in */
+}
 
     .card p {
       margin: 0.3rem 0;
@@ -112,18 +111,14 @@
       font-weight: 600;
       color: var(--primary);
     }
-.formula {
-  font-size: 14px !important;
-  color: #999;
-  margin-top: 0.2rem;
-  line-height: 1.2;
-  font-style: italic;
-}
 
-
-
-
-
+    .formula {
+      font-size: 0.425rem;
+      color: #999;
+      margin-top: 0.2rem;
+      line-height: 1.2;
+      font-style: italic;
+    }
 
     .citation {
       font-size: 0.75rem;
@@ -192,10 +187,12 @@
       const cumulativeReturn = totalBenefit / investment;
 
       const slider = document.getElementById('years');
+      let sliderWidth = slider.offsetWidth;
+      if (sliderWidth === 0) sliderWidth = 300; // fallback for desktop load
+
       const maxYears = parseInt(slider.max);
       const currentPercent = (years / maxYears) * 100;
       const payoffPercent = (breakEvenYears / maxYears) * 100;
-      const sliderWidth = slider.offsetWidth || 300;
       const thumbWidthPx = 20;
       const thumbOffsetPercent = (thumbWidthPx / sliderWidth) * 100;
       const fillEnd = Math.min(currentPercent + thumbOffsetPercent, 100);
@@ -220,7 +217,7 @@
         </div>
 
         <div class="card">
-          <h2>Projected Savings</h2>
+          <h2>Projected Savings (${years} years)</h2>
           <p>Personal savings: <span class="highlight">$${totalCyclistSavings.toLocaleString()}</span></p>
           <p>Health care savings: <span class="highlight">$${healthCareSavings.toLocaleString()}</span></p>
           <p class="formula"><em>Formula: Personal Savings = Cyclist Count × Annual Savings × Years</em></p>
@@ -235,9 +232,9 @@
         </div>
 
         <div class="card">
-          <h2>Economic Return</h2>
+          <h2>Economic Return (${years} years)</h2>
           <p>Total benefit: <span class="highlight">$${totalBenefit.toLocaleString()}</span></p>
-                      <p>Net value: <span class="highlight">${netBenefit > 0 ? `$${netBenefit.toLocaleString()}` : '—'}</span></p>
+          <p>Net value: <span class="highlight">${netBenefit > 0 ? `$${netBenefit.toLocaleString()}` : '—'}</span></p>
           <p>Return: <span class="highlight">${cumulativeReturn.toFixed(2)}x</span></p>
           <p class="formula"><em>Formula: Total Benefit = Personal Savings + Health Care Savings</em></p>
           <p class="formula"><em>Formula: Net Value = Total Benefit − Investment</em></p>
