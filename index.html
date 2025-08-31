@@ -164,36 +164,35 @@
   border-top: 2px solid #ccc;
 }
 }
-
-.responsive-table {
-  width: 100%;
-  overflow-x: auto;
+input[type="range"] {
+  appearance: none;
+  height: 8px;
+  border-radius: 5px;
+  background: linear-gradient(to right, #2e8b57 0%, #ccc 0%);
+  outline: none;
+  transition: background 0.3s ease-in-out;
 }
 
-.responsive-table table {
-  width: 100%;
-  border-collapse: collapse;
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background: var(--primary);
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 0 2px rgba(0,0,0,0.2);
 }
 
-.responsive-table td {
-  padding: 8px;
-  vertical-align: top;
+input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background: var(--primary);
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
 }
 
-@media screen and (max-width: 480px) {
-  .responsive-table td {
-    display: block;
-    width: 100%;
-    text-align: left;
-    padding: 6px 0;
-  }
-
-  .responsive-table tr {
-    display: block;
-    margin-bottom: 12px;
-    border-bottom: 1px solid #ccc;
-  }
-}
 .label {
   font-weight: bold;
 }
@@ -297,94 +296,89 @@
     const perDollarImpact = totalBenefit / investment;
     const showNetValue = netBenefit > 0;
 
-    // 🎨 Dynamic slider gradient if ROI > 1
+    // 🎨 Slider gradient: green to break-even, teal beyond
     const slider = document.getElementById('years');
-    if (cumulativeReturn > 1) {
-      const percent = Math.min((cumulativeReturn / 5) * 100, 100);
-      slider.style.background = `linear-gradient(to right, #2e8b57 ${percent}%, #ccc ${percent}%)`;
+    const maxYears = parseInt(slider.max);
+    const payoffYears = breakEvenYears;
+    const payoffPercent = Math.round((payoffYears / maxYears) * 100);
+    const currentPercent = Math.round((years / maxYears) * 100);
+
+    let gradient = '';
+    if (years <= payoffYears) {
+      gradient = `linear-gradient(to right, #2e8b57 ${currentPercent}%, #ccc ${currentPercent}%)`;
     } else {
-      slider.style.background = '#ccc';
+      gradient = `linear-gradient(to right, 
+        #2e8b57 ${payoffPercent}%, 
+        #00bfa5 ${payoffPercent}%, 
+        #00bfa5 ${currentPercent}%, 
+        #ccc ${currentPercent}%)`;
     }
+    slider.style.background = gradient;
 
     document.getElementById('output').innerHTML = `
-<div class="faq-card">
-  <h3><span class="question-icon">💡</span>How many cyclists are assumed in this model?</h3>
-  <p><strong>Answer:</strong> This model assumes the city attracts <span class="highlight">${cyclistCount.toLocaleString()}</span> regular cyclists. That’s the number needed to break even on a <span class="highlight">$${investment.toLocaleString()}</span> investment over <span class="highlight">${breakEvenYears}</span> years, with each cyclist saving <span class="highlight">$${savings.toLocaleString()}</span> annually.</p>
-  
-  <p>This fixed cyclist count is used to calculate cumulative savings across all timeframes selected below.</p>
+      <div class="faq-card">
+        <h3><span class="question-icon">💡</span>How many cyclists are assumed in this model?</h3>
+        <p><strong>Answer:</strong> This model assumes the city attracts <span class="highlight">${cyclistCount.toLocaleString()}</span> regular cyclists. That’s the number needed to break even on a <span class="highlight">$${investment.toLocaleString()}</span> investment over <span class="highlight">${breakEvenYears}</span> years, with each cyclist saving <span class="highlight">$${savings.toLocaleString()}</span> annually.</p>
+        <p>This fixed cyclist count is used to calculate cumulative savings across all timeframes selected below.</p>
+        <p><strong>Why it’s useful:</strong> This break-even cyclist count gives cities a clear planning target. If ${cyclistCount} regular riders are sustained over ${breakEvenYears} years, the investment pays for itself. It serves as a conservative benchmark based on direct economic savings per rider.</p>
+        <p class="formula"><em>Formula: Cyclist Count = Investment ÷ (Annual Savings × ${breakEvenYears})</em></p>
+      </div>
 
-  <p><strong>Why it’s useful:</strong> This break-even cyclist count gives cities a clear planning target. If ${cyclistCount} regular riders are sustained over ${breakEvenYears} years, the investment pays for itself. It serves as a conservative benchmark based on direct economic savings per rider.</p>
-
-  <p class="formula"><em>Formula: Cyclist Count = Investment ÷ (Annual Savings × ${breakEvenYears})</em></p>
-</div>
-
-
-
-
-
-
-  <div class="faq-card">
-  <h3><span class="question-icon">❤️</span>How much could health care costs decrease over ${years} ${years === 1 ? 'year' : 'years'}?</h3>
-  <p><strong>Answer:</strong> Beyond individual savings, cycling infrastructure also drives long-term reductions in health care costs. These benefits are modeled using a conservative multiplier based on peer-reviewed studies.</p>
-
-  <p>Over <span class="highlight">${years.toLocaleString()}</span> years, an initial investment of <span class="highlight">$${investment.toLocaleString()}</span> is projected to reduce health care costs by <span class="highlight">$${periodHealthCostReduction.toLocaleString()}</span>, based on a long-term return of <span class="highlight">$${multiplier}</span> per $1 invested<sup><a href="#note1">1</a></sup>.</p>
-
-  <p class="formula"><em>Formula: Lifetime Savings = Investment × Multiplier</em></p>
-  <p class="formula"><em>Formula: Annual Savings = Lifetime Savings ÷ ${lifetimeYears}</em></p>
-  <p class="formula"><em>Formula: Period Savings = Annual Savings × ${years}</em></p>
-</div>
-
+      <div class="faq-card">
+        <h3><span class="question-icon">❤️</span>How much could health care and personal savings grow over ${years} ${years === 1 ? 'year' : 'years'}?</h3>
+        <p><strong>Answer:</strong> Cycling infrastructure generates two major types of savings: direct economic benefits for individuals, and long-term reductions in health care costs. Together, these reflect the full value of active transport investments.</p>
+        <p>Over <span class="highlight">${years.toLocaleString()}</span> years, ${cyclistCount.toLocaleString()} regular cyclists are projected to save <span class="highlight">$${totalCyclistSavings.toLocaleString()}</span> through reduced transportation costs, improved productivity, and other personal benefits.</p>
+        <p>This is projected to reduce health care costs by <span class="highlight">$${periodHealthCostReduction.toLocaleString()}</span>, based on a long-term return of <span class="highlight">$${multiplier}</span> per $1 invested<sup><a href="#note1">1</a></sup>.</p>
+        <p class="formula"><em>Formula: Personal Savings = Cyclist Count × Annual Savings × Years</em></p>
+        <p class="formula"><em>Formula: Health Care Savings = (Investment × Multiplier ÷ ${lifetimeYears}) × Years</em></p>
+      </div>
 
       <div class="faq-card">
         <h3><span class="question-icon">🏆</span>What is the economic return on cycling infrastructure over ${years} years?</h3>
-        <div class="faq-card">
-  <h3><span class="question-icon">🏆</span>What is the economic return on cycling infrastructure over ${years} years?</h3>
-  <div class="pnl-block">
-    <div class="pnl-row">
-      <span class="label">Initial Investment</span>
-      <span class="value">$${investment.toLocaleString()}</span>
-    </div>
-    <div class="pnl-row">
-      <span class="label">Cyclist Savings</span>
-      <span class="value highlight">$${totalCyclistSavings.toLocaleString()}</span>
-    </div>
-    <div class="pnl-row">
-      <span class="label">Health Care Savings</span>
-      <span class="value highlight">$${periodHealthCostReduction.toLocaleString()}</span>
-    </div>
-    <div class="pnl-row">
-      <span class="label">Total Benefit</span>
-      <span class="value highlight">$${totalBenefit.toLocaleString()}</span>
-    </div>
-    ${showNetValue ? `
-      <div class="pnl-row">
-        <span class="label">Net Value Accrued</span>
-        <span class="value highlight">$${netBenefit.toLocaleString()}</span>
+        <div class="pnl-block">
+          <div class="pnl-row">
+            <span class="label">Initial Investment</span>
+            <span class="value">$${investment.toLocaleString()}</span>
+          </div>
+          <div class="pnl-row">
+            <span class="label">Cyclist Savings</span>
+            <span class="value highlight">$${totalCyclistSavings.toLocaleString()}</span>
+          </div>
+          <div class="pnl-row">
+            <span class="label">Health Care Savings</span>
+            <span class="value highlight">$${periodHealthCostReduction.toLocaleString()}</span>
+          </div>
+          <div class="pnl-row">
+            <span class="label">Total Benefit</span>
+            <span class="value highlight">$${totalBenefit.toLocaleString()}</span>
+          </div>
+          ${showNetValue ? `
+            <div class="pnl-row">
+              <span class="label">Net Value Accrued</span>
+              <span class="value highlight">$${netBenefit.toLocaleString()}</span>
+            </div>
+          ` : `
+            <div class="pnl-row">
+              <span class="label">Net Value Accrued</span>
+              <span class="value highlight">—</span>
+            </div>
+          `}
+          <div class="pnl-row">
+            <span class="label">Cumulative Return to Date</span>
+            <span class="value highlight">${cumulativeReturn.toFixed(2)}x</span>
+          </div>
+          <div class="pnl-row">
+            <span class="label">Per-Dollar Impact</span>
+            <span class="value highlight">$${perDollarImpact.toFixed(1)} per $1 invested</span>
+          </div>
+        </div>
+        <p class="formula"><em>Formula: Cyclist Savings = Cyclist Count × Annual Savings × Years</em></p>
+        <p class="formula"><em>Formula: Health Care Savings = (Investment × Multiplier ÷ ${lifetimeYears}) × Years</em></p>
+        <p class="formula"><em>Formula: Total Benefit = Cyclist Savings + Health Care Savings</em></p>
+        <p class="formula"><em>Formula: Net Value = Total Benefit − Investment</em></p>
+        <p class="formula"><em>Formula: Cumulative Return = Total Benefit ÷ Investment</em></p>
+        <p class="formula"><em>Formula: Per-Dollar Impact = Total Benefit ÷ Investment</em></p>
       </div>
-    ` : `
-      <div class="pnl-row">
-        <span class="label">Net Value Accrued</span>
-        <span class="value highlight">—</span>
-      </div>
-    `}
-    <div class="pnl-row">
-      <span class="label">Cumulative Return to Date</span>
-      <span class="value highlight">${cumulativeReturn.toFixed(2)}x</span>
-    </div>
-    <div class="pnl-row">
-      <span class="label">Per-Dollar Impact</span>
-      <span class="value highlight">$${perDollarImpact.toFixed(1)} per $1 invested</span>
-    </div>
-  </div>
-
-  <p class="formula"><em>Formula: Cyclist Savings = Cyclist Count × Annual Savings × Years</em></p>
-  <p class="formula"><em>Formula: Health Care Savings = (Investment × Multiplier ÷ ${lifetimeYears}) × Years</em></p>
-  <p class="formula"><em>Formula: Total Benefit = Cyclist Savings + Health Care Savings</em></p>
-  <p class="formula"><em>Formula: Net Value = Total Benefit − Investment</em></p>
-  <p class="formula"><em>Formula: Cumulative Return = Total Benefit ÷ Investment</em></p>
-  <p class="formula"><em>Formula: Per-Dollar Impact = Total Benefit ÷ Investment</em></p>
-</div>
-
 
       <p class="note" id="note1">
         *Note<sup>1</sup>: The <span class="highlight">$${multiplier}</span> figure is based on total health care savings over a <span class="highlight">${lifetimeYears}-year</span> infrastructure lifespan, as reported in 
@@ -393,7 +387,7 @@
         The savings shown here are scaled proportionally to your selected timeframe for illustration.*
       </p>
       <p class="note" id="note2">
-        *Note<sup>2</sup>: Infrastructure investments typically yield modest returns in early years, with benefits compounding over time due to sustained behavioral adoption, health improvements, and long-term cost avoidance. See 
+        *Note<sup>2</sup>: Infrastructure investments typically yield modest returns in improvements, and long-term cost avoidance. See 
         <a href="https://www.sciencedirect.com/science/article/pii/S2214140518301485" target="_blank">economic modeling of active transport investments</a> for more.*
       </p>
     `;
@@ -404,6 +398,8 @@
     updateSliderLabel(5);
   });
 </script>
+
+
 
 
 
