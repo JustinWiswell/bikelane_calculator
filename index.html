@@ -186,35 +186,35 @@ input[type="range"] {
 
     document.getElementById('output').innerHTML = `
       <div class="card">
-        <h2>Assumed Cyclists</h2>
-        <p><span class="highlight">${cyclistCount.toLocaleString()}</span> regular cyclists needed to break even over ${breakEvenYears} years.</p>
-        <p class="formula"><em>Formula: Cyclist Count = Investment ÷ (Annual Savings × ${breakEvenYears})</em></p>
-      </div>
+  <h2>Assumed Cyclists</h2>
+  <p>A one-time investment of <span class="highlight">$${investment.toLocaleString()}</span> in cycling infrastructure requires just <span class="highlight">${cyclistCount.toLocaleString()}</span> regular cyclists to deliver a positive ROI in ${breakEvenYears} years.</p>
+  <p class="formula"><em>Formula: Cyclist Count = Investment ÷ (Annual Savings × ${breakEvenYears})</em></p>
+</div>
 
-      <div class="card">
-        <h2>Projected Savings over ${years} years</h2>
-        <p>Personal savings: <span class="highlight">$${totalCyclistSavings.toLocaleString()}</span></p>
-        <p>Health care savings: <span class="highlight">$${healthCareSavings.toLocaleString()}</span></p>
-        <p class="formula"><em>Formula: Personal Savings = Cyclist Count × Annual Savings × Years</em></p>
-        <p class="formula"><em>Formula: Health Care Savings = (Investment × ${multiplier} ÷ ${lifetimeYears}) × Years</em></p>
-        <p class="citation">
-          <small>
-            *Based on findings from the 
-            <a href="https://itdp.org/publication/the-case-for-cycling-infrastructure-investments/" target="_blank">CyclingMax Tool report</a> by ITDP and the World Bank, and 
-            <a href="https://cyclingmagazine.ca/sections/healthnutrition/for-these-canadian-cities-the-health-benefits-of-cycling-infrastructure-significantly-outweighed-the-cost-of-new-bike-lanes/" target="_blank">Simon Fraser University’s study</a> on Canadian cities.
-          </small>
-        </p>
-      </div>
 
-      <div class="card">
-        <h2>Economic Return after ${years} years</h2>
-        <p>Total benefit: <span class="highlight">$${totalBenefit.toLocaleString()}</span></p>
-        <p>Net value: <span class="highlight">${netBenefit > 0 ? `$${netBenefit.toLocaleString()}` : '—'}</span></p>
-        <p>Return: <span class="highlight">${cumulativeReturn.toFixed(2)}x</span></p>
-        <p class="formula"><em>Formula: Total Benefit = Personal Savings + Health Care Savings</em></p>
-        <p class="formula"><em>Formula: Net Value = Total Benefit − Investment</em></p>
-        <p class="formula"><em>Formula: Return = Total Benefit ÷ Investment</em></p>
-      </div>
+    <div class="card">
+  <h2>Economic Return after ${years} years</h2>
+  <p>Personal savings: <span class="highlight">$${totalCyclistSavings.toLocaleString()}</span></p>
+  <p>Health care savings: <span class="highlight">$${healthCareSavings.toLocaleString()}</span></p>
+  <p>Total benefit: <span class="highlight">$${totalBenefit.toLocaleString()}</span></p>
+  <p>Net value: <span class="highlight">${netBenefit > 0 ? `$${netBenefit.toLocaleString()}` : '—'}</span></p>
+  <p>Return: <span class="highlight">${cumulativeReturn.toFixed(2)}x</span></p>
+
+  <p class="formula"><em>Formula: Personal Savings = Cyclist Count × Annual Savings × Years</em></p>
+  <p class="formula"><em>Formula: Health Care Savings = (Investment × ${multiplier} ÷ ${lifetimeYears}) × Years</em></p>
+  <p class="formula"><em>Formula: Total Benefit = Personal Savings + Health Care Savings</em></p>
+  <p class="formula"><em>Formula: Net Value = Total Benefit − Investment</em></p>
+  <p class="formula"><em>Formula: Return = Total Benefit ÷ Investment</em></p>
+
+  <p class="citation">
+    <small>
+      *Based on findings from the 
+      <a href="https://itdp.org/publication/the-case-for-cycling-infrastructure-investments/" target="_blank">CyclingMax Tool report</a> by ITDP and the World Bank, and 
+      <a href="https://cyclingmagazine.ca/sections/healthnutrition/for-these-canadian-cities-the-health-benefits-of-cycling-infrastructure-significantly-outweighed-the-cost-of-new-bike-lanes/" target="_blank">Simon Fraser University’s study</a> on Canadian cities.
+    </small>
+  </p>
+</div>
+
     `;
   }
 
