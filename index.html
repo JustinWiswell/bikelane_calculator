@@ -318,29 +318,42 @@ input[type="range"]::-moz-range-thumb {
     const showNetValue = netBenefit > 0;
 
     // 🎨 Slider gradient: green to break-even, amber beyond
-    const slider = document.getElementById('years');
-    const maxYears = parseInt(slider.max);
-    const payoffPercent = Math.round((breakEvenYears / maxYears) * 100);
-    const currentPercent = Math.round((years / maxYears) * 100);
+   const slider = document.getElementById('years');
+const maxYears = parseInt(slider.max);
+const payoffPercent = Math.round((breakEvenYears / maxYears) * 100);
+const currentPercent = Math.round((years / maxYears) * 100);
 
-    // Adjust gradient to align with square thumb
-    const thumbWidth = 20; // px
-    const sliderWidth = slider.offsetWidth || 300; // fallback
-    const thumbOffsetPercent = (thumbWidth / sliderWidth) * 100;
+// Dynamically calculate thumb width
+let thumbWidthPx = 20; // fallback
+try {
+  const sliderStyles = window.getComputedStyle(slider);
+  const thumbStyle = sliderStyles.getPropertyValue('--thumb-width');
+  if (thumbStyle) {
+    thumbWidthPx = parseInt(thumbStyle);
+  }
+} catch (e) {
+  // fallback remains 20px
+}
 
-    let gradient = '';
-    if (years <= breakEvenYears) {
-      gradient = `linear-gradient(to right, 
-        var(--primary) ${currentPercent + thumbOffsetPercent}%, 
-        #ccc ${currentPercent + thumbOffsetPercent}%)`;
-    } else {
-      gradient = `linear-gradient(to right, 
-        var(--primary) ${payoffPercent + thumbOffsetPercent}%, 
-        var(--surplus) ${payoffPercent + thumbOffsetPercent}%, 
-        var(--surplus) ${currentPercent + thumbOffsetPercent}%, 
-        #ccc ${currentPercent + thumbOffsetPercent}%)`;
-    }
-    slider.style.background = gradient;
+const sliderWidth = slider.offsetWidth || 300;
+const thumbOffsetPercent = (thumbWidthPx / sliderWidth) * 100;
+
+// Gradient logic: amber bar ends under thumb
+let gradient = '';
+if (years <= breakEvenYears) {
+  gradient = `linear-gradient(to right, 
+    var(--primary) ${currentPercent + thumbOffsetPercent}%, 
+    #ccc ${currentPercent + thumbOffsetPercent}%)`;
+} else {
+  gradient = `linear-gradient(to right, 
+    var(--primary) ${payoffPercent}%, 
+    var(--surplus) ${payoffPercent}%, 
+    var(--surplus) ${currentPercent + thumbOffsetPercent}%, 
+    #ccc ${currentPercent + thumbOffsetPercent}%)`;
+}
+
+slider.style.background = gradient;
+
 
     document.getElementById('output').innerHTML = `
       <div class="faq-card">
