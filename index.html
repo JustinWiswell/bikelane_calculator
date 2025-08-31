@@ -127,6 +127,84 @@
       text-transform: uppercase;
       color: #555;
     }
+.pnl-block {
+  margin-top: 10px;
+}
+
+.pnl-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+  flex-wrap: wrap;
+}
+
+.pnl-row .label {
+  font-weight: bold;
+  flex: 1 1 60%;
+}
+
+.pnl-row .value {
+  text-align: right;
+  flex: 1 1 40%;
+  font-weight: bold;
+}
+
+@media screen and (max-width: 480px) {
+  .pnl-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .pnl-row .value {
+    text-align: left;
+    margin-top: 4px;
+  }
+  .pnl-row:first-child {
+  border-top: 2px solid #ccc;
+}
+}
+
+.responsive-table {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.responsive-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.responsive-table td {
+  padding: 8px;
+  vertical-align: top;
+}
+
+@media screen and (max-width: 480px) {
+  .responsive-table td {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 6px 0;
+  }
+
+  .responsive-table tr {
+    display: block;
+    margin-bottom: 12px;
+    border-bottom: 1px solid #ccc;
+  }
+}
+.label {
+  font-weight: bold;
+}
+.value {
+  text-align: right;
+  font-weight: bold;
+}
+.highlight {
+  color: #2e8b57;
+}
+
     .note {
       font-size: 0.9em;
       color: #555;
@@ -146,6 +224,7 @@
     p, li {
       line-height: 1.5;
     }
+
   </style>
 </head>
 <body>
@@ -153,8 +232,7 @@
     <h2>🚴 Cycling Investment Calculator</h2>
     <p class="summary">
       This tool estimates the economic and health care benefits of investing in cycling infrastructure.
-      Enter your investment amount, annual savings per cyclist, and time period to see projected personal savings,
-      health care cost reductions, and total returns for regular cyclists.
+      Enter your investment amount and annual savings per cyclist, then use the slider to explore how benefits scale over time.
     </p>
 
     <label for="investment">Investment Amount:</label>
@@ -167,107 +245,163 @@
       <input type="text" id="savings" value="4,000" inputmode="numeric">
     </div>
 
-    <label for="years">Years (for partial calculation):</label>
-    <div class="input-full">
-      <input type="number" id="years" value="5" min="1">
-    </div>
-
-    <button onclick="calculate()">Calculate</button>
+    <label for="years">Select Timeframe (Years):</label>
+    <input type="range" id="years" min="1" max="20" value="5" oninput="updateSliderLabel(this.value)">
+    <span id="year-label">5 years</span>
 
     <div id="output"></div>
   </div>
 
-  <script>
-    function formatNumberWithCommas(value) {
-      const numericValue = value.replace(/\D/g, '');
-      if (!numericValue) return '';
-      return numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+<script>
+  function formatNumberWithCommas(value) {
+    const numericValue = value.replace(/\D/g, '');
+    if (!numericValue) return '';
+    return numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  }
+
+  ['investment', 'savings'].forEach(id => {
+    const input = document.getElementById(id);
+    input.addEventListener('input', (e) => {
+      const formatted = formatNumberWithCommas(e.target.value);
+      e.target.value = formatted;
+      e.target.setSelectionRange(e.target.value.length, e.target.value.length);
+      calculate();
+    });
+    input.addEventListener('blur', (e) => {
+      e.target.value = formatNumberWithCommas(e.target.value);
+    });
+  });
+
+  function updateSliderLabel(value) {
+    document.getElementById('year-label').textContent = `${value} years`;
+    calculate();
+  }
+
+  function calculate() {
+    const investment = parseFloat(document.getElementById('investment').value.replace(/,/g, '')) || 0;
+    const savings = parseFloat(document.getElementById('savings').value.replace(/,/g, '')) || 0;
+    const years = parseFloat(document.getElementById('years').value) || 0;
+
+    const multiplier = 3;
+    const lifetimeYears = 20;
+    const breakEvenYears = 5;
+
+    const cyclistCount = Math.round(investment / (savings * breakEvenYears));
+    const totalCyclistSavings = cyclistCount * savings * years;
+    const lifetimeHealthCostReduction = investment * multiplier;
+    const annualHealthCostReduction = lifetimeHealthCostReduction / lifetimeYears;
+    const periodHealthCostReduction = annualHealthCostReduction * years;
+    const totalBenefit = totalCyclistSavings + periodHealthCostReduction;
+    const netBenefit = totalBenefit - investment;
+    const cumulativeReturn = totalBenefit / investment;
+    const perDollarImpact = totalBenefit / investment;
+    const showNetValue = netBenefit > 0;
+
+    // 🎨 Dynamic slider gradient if ROI > 1
+    const slider = document.getElementById('years');
+    if (cumulativeReturn > 1) {
+      const percent = Math.min((cumulativeReturn / 5) * 100, 100);
+      slider.style.background = `linear-gradient(to right, #2e8b57 ${percent}%, #ccc ${percent}%)`;
+    } else {
+      slider.style.background = '#ccc';
     }
 
-    ['investment', 'savings'].forEach(id => {
-      const input = document.getElementById(id);
-      input.addEventListener('input', (e) => {
-        const formatted = formatNumberWithCommas(e.target.value);
-        e.target.value = formatted;
-        e.target.setSelectionRange(e.target.value.length, e.target.value.length);
-      });
-      input.addEventListener('blur', (e) => {
-        e.target.value = formatNumberWithCommas(e.target.value);
-      });
-    });
+    document.getElementById('output').innerHTML = `
+<div class="faq-card">
+  <h3><span class="question-icon">💡</span>How many cyclists are assumed in this model?</h3>
+  <p><strong>Answer:</strong> This model assumes the city attracts <span class="highlight">${cyclistCount.toLocaleString()}</span> regular cyclists. That’s the number needed to break even on a <span class="highlight">$${investment.toLocaleString()}</span> investment over <span class="highlight">${breakEvenYears}</span> years, with each cyclist saving <span class="highlight">$${savings.toLocaleString()}</span> annually.</p>
+  
+  <p>This fixed cyclist count is used to calculate cumulative savings across all timeframes selected below.</p>
 
-    function calculate() {
-      const investment = parseFloat(document.getElementById('investment').value.replace(/,/g, '')) || 0;
-      const savings = parseFloat(document.getElementById('savings').value.replace(/,/g, '')) || 0;
-      const years = parseFloat(document.getElementById('years').value) || 0;
+  <p><strong>Why it’s useful:</strong> This break-even cyclist count gives cities a clear planning target. If ${cyclistCount} regular riders are sustained over ${breakEvenYears} years, the investment pays for itself. It serves as a conservative benchmark based on direct economic savings per rider.</p>
 
-      const multiplier = 3;
-      const lifetimeYears = 20;
-
-      const cyclistsFinancial = (savings > 0 && years > 0) ? (investment / (savings * years)) : 0;
-      const totalCyclistSavings = cyclistsFinancial * savings * years;
-      const lifetimeHealthCostReduction = investment * multiplier;
-      const annualHealthCostReduction = lifetimeHealthCostReduction / lifetimeYears;
-      const periodHealthCostReduction = annualHealthCostReduction * years;
-      const totalBenefit = totalCyclistSavings + periodHealthCostReduction;
-      const lifetimeCyclistSavings = cyclistsFinancial * savings * lifetimeYears;
-      const totalLifetimeBenefit = lifetimeCyclistSavings + lifetimeHealthCostReduction;
-
-      document.getElementById('output').innerHTML = `
-       <div class="faq-card">
-  <h3><span class="question-icon">💡</span>How many regular cyclists would the city need to return $${investment.toLocaleString()} in the form of personal savings to regular cyclists?</h3>
-  <p><strong>Answer:</strong> If the city invested <span class="highlight">$${investment.toLocaleString()}</span> and attracted <span class="highlight">${Math.round(cyclistsFinancial).toLocaleString()}</span> regular cyclists, each saving <span class="highlight">$${savings.toLocaleString()}</span> annually, the combined personal savings over <span class="highlight">${years.toLocaleString()}</span> years would be <span class="highlight">$${totalCyclistSavings.toLocaleString()}</span>.</p>
-  <p class="formula"><em>Formula: Cyclist Count = Investment ÷ (Annual Savings × Years)</em></p>
+  <p class="formula"><em>Formula: Cyclist Count = Investment ÷ (Annual Savings × ${breakEvenYears})</em></p>
 </div>
 
 
-     <div class="faq-card">
-  <h3><span class="question-icon">❤️</span>How much would Provincial health care costs reduce over ${years.toLocaleString()} years, based on a $${multiplier} return per $1 invested?</h3>
-  <p><strong>Answer:</strong> Over <span class="highlight">${years.toLocaleString()}</span> years, the initial investment of <span class="highlight">$${investment.toLocaleString()}</span> is projected to reduce health care costs by <span class="highlight">$${periodHealthCostReduction.toLocaleString()}</span>, based on an annual saving of <span class="highlight">$${annualHealthCostReduction.toLocaleString()}</span> and a total lifetime saving of <span class="highlight">$${lifetimeHealthCostReduction.toLocaleString()}</span> over <span class="highlight">${lifetimeYears}</span> years.</p>
-  <p class="formula"><em>Formula: Lifetime Savings = Investment × Multiplier</em></p>
-  <p class="formula"><em>Formula: Annual Savings = Lifetime Savings ÷ Lifetime Years</em></p>
-  <p class="formula"><em>Formula: Period Savings = Annual Savings × Years</em></p>
-</div>
+
+
 
 
    <div class="faq-card">
-  <h3><span class="question-icon">📊</span>What is the total personal financial benefit to regular cyclists + reduction in health care spending (over ${years.toLocaleString()} years)?</h3>
-  <p><strong>Answer:</strong> 📈 Total ${years.toLocaleString()}‑year economic return: <span class="highlight">$${totalBenefit.toLocaleString()}</span></p>
-  <ul>
-    <li class="personal">Cyclist savings: <span class="highlight">$${totalCyclistSavings.toLocaleString()}</span></li>
-    <li class="health">Health care savings: <span class="highlight">$${periodHealthCostReduction.toLocaleString()}</span></li>
-  </ul>
-  <p class="formula"><em>Formula: Total Benefit = Cyclist Savings + Health Care Savings</em></p>
+  <h3><span class="question-icon">❤️</span>How much could health care costs decrease over your selected timeframe?</h3>
+  <p><strong>Answer:</strong> Beyond individual savings, cycling infrastructure also drives long-term reductions in health care costs. These benefits are modeled using a conservative multiplier based on peer-reviewed studies.</p>
+
+  <p>Over <span class="highlight">${years.toLocaleString()}</span> years, an initial investment of <span class="highlight">$${investment.toLocaleString()}</span> is projected to reduce health care costs by <span class="highlight">$${periodHealthCostReduction.toLocaleString()}</span>, based on a long-term return of <span class="highlight">$${multiplier}</span> per $1 invested<sup><a href="#note1">1</a></sup>.</p>
+
+  <p class="formula"><em>Formula: Lifetime Savings = Investment × Multiplier</em></p>
+  <p class="formula"><em>Formula: Annual Savings = Lifetime Savings ÷ ${lifetimeYears}</em></p>
+  <p class="formula"><em>Formula: Period Savings = Annual Savings × ${years}</em></p>
 </div>
 
 
-<div class="faq-card">
-  <h3><span class="question-icon">🏆</span>What is the total personal financial benefit to regular cyclists + reduction in health care spending (over ${lifetimeYears} years)?</h3>
-  <p><strong>Answer:</strong> 📈 Total ${lifetimeYears}-year economic return: <span class="highlight">$${totalLifetimeBenefit.toLocaleString()}</span></p>
-  <ul>
-  <li><strong>Initial investment:</strong> <span class="highlight">$${investment.toLocaleString()}</span></li>
-  <li><strong>Cyclist savings:</strong> <span class="highlight">$${lifetimeCyclistSavings.toLocaleString()}</span></li>
-  <li><strong>Health care savings:</strong> <span class="highlight">$${lifetimeHealthCostReduction.toLocaleString()}</span></li>
-</ul>
-  <p><strong>Net benefit:</strong> <span class="highlight">$${(totalLifetimeBenefit - investment).toLocaleString()}</span></p>
-  <p><strong>Return on investment (ROI):</strong> <span class="highlight">${((totalLifetimeBenefit - investment) / investment).toFixed(1)}x</span></p>
-  <p><strong>Per-dollar impact:</strong> For every $1 invested, the province sees <span class="highlight">$${(totalLifetimeBenefit / investment).toFixed(1)}</span> in combined economic benefit.</p>
-  <p class="formula"><em>Formula: Total Benefit = Cyclist Savings + Health Care Savings</em></p>
-  <p class="formula"><em>Formula: Net Benefit = Total Benefit − Investment</em></p>
-  <p class="formula"><em>Formula: ROI = Net Benefit ÷ Investment</em></p>
-</div>
+      <div class="faq-card">
+        <h3><span class="question-icon">🏆</span>What is the economic return on cycling infrastructure over ${years} years?</h3>
+        <div class="pnl-block">
+          <div class="pnl-row">
+            <span class="label">Initial Investment</span>
+            <span class="value">$${investment.toLocaleString()}</span>
+          </div>
+          <div class="pnl-row">
+            <span class="label">Cyclist Savings</span>
+            <span class="value highlight">$${totalCyclistSavings.toLocaleString()}</span>
+          </div>
+          <div class="pnl-row">
+            <span class="label">Health Care Savings</span>
+            <span class="value highlight">$${periodHealthCostReduction.toLocaleString()}</span>
+          </div>
+          <div class="pnl-row">
+            <span class="label">Total Benefit</span>
+            <span class="value highlight">$${totalBenefit.toLocaleString()}</span>
+          </div>
+          ${showNetValue ? `
+            <div class="pnl-row">
+              <span class="label">Net Value Accrued</span>
+              <span class="value highlight">$${netBenefit.toLocaleString()}</span>
+            </div>
+          ` : `
+            <div class="pnl-row">
+              <span class="label">Net Value Accrued</span>
+              <span class="value highlight">—</span>
+            </div>
+          `}
+          <div class="pnl-row">
+            <span class="label">Cumulative Return to Date</span>
+            <span class="value highlight">${cumulativeReturn.toFixed(2)}x</span>
+          </div>
+          <div class="pnl-row">
+            <span class="label">Per-Dollar Impact</span>
+            <span class="value highlight">$${perDollarImpact.toFixed(1)} per $1 invested</span>
+          </div>
+        </div>
+        <p class="formula"><em>Formula: Cyclist Savings = Cyclist Count × Annual Savings × Years</em></p>
+        <p class="formula"><em>Formula: Total Benefit = Cyclist Savings + Health Care Savings</em></p>
+        <p class="formula"><em>Formula: Net Value = Total Benefit − Investment</em></p>
+        <p class="formula"><em>Formula: Cumulative Return = Total Benefit ÷ Investment</em></p>
+        <p class="formula"><em>Formula: Per-Dollar Impact = Total Benefit ÷ Investment</em></p>
+      </div>
+
+      <p class="note" id="note1">
+        *Note<sup>1</sup>: The <span class="highlight">$${multiplier}</span> figure is based on total health care savings over a <span class="highlight">${lifetimeYears}-year</span> infrastructure lifespan, as reported in 
+        <a href="https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0246419" target="_blank">peer‑reviewed studies</a>.  
+        This reflects an <strong>annualized health care cost reduction of $225 per $1 million invested</strong>.  
+        The savings shown here are scaled proportionally to your selected timeframe for illustration.*
+      </p>
+      <p class="note" id="note2">
+        *Note<sup>2</sup>: Infrastructure investments typically yield modest returns in early years, with benefits compounding over time due to sustained behavioral adoption, health improvements, and long-term cost avoidance. See 
+        <a href="https://www.sciencedirect.com/science/article/pii/S2214140518301485" target="_blank">economic modeling of active transport investments</a> for more.*
+      </p>
+    `;
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('years').value = 5;
+    updateSliderLabel(5);
+  });
+</script>
 
 
 
 
-
-        <p class="note" id="note1">
-          *Note<sup>1</sup>: The $${multiplier} figure is based on total health care savings over the assumed ${lifetimeYears}‑year lifetime of the infrastructure, as reported in 
-          <a href="https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0246419" target="_blank">peer‑reviewed studies</a>. 
-          The ${years.toLocaleString()}‑year figure shown here is a proportional estimate for illustration.*
-        </p>
-      `;
-    }
-  </script>
 </body>
 </html>
