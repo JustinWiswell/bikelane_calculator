@@ -206,6 +206,7 @@ input[type="range"]::-webkit-slider-thumb {
   cursor: pointer;
   border: none;
   box-shadow: 0 0 2px rgba(0,0,0,0.2);
+  transform: translateX(10px); /* nudges thumb right so leading edge is flush */
 }
 
 input[type="range"]::-moz-range-thumb {
@@ -215,9 +216,8 @@ input[type="range"]::-moz-range-thumb {
   border-radius: 4px;
   cursor: pointer;
   border: none;
+  transform: translateX(10px); /* same fix for Firefox */
 }
-
-
 
 
   .note {
@@ -323,15 +323,22 @@ input[type="range"]::-moz-range-thumb {
     const payoffPercent = Math.round((breakEvenYears / maxYears) * 100);
     const currentPercent = Math.round((years / maxYears) * 100);
 
+    // Adjust gradient to align with square thumb
+    const thumbWidth = 20; // px
+    const sliderWidth = slider.offsetWidth || 300; // fallback
+    const thumbOffsetPercent = (thumbWidth / sliderWidth) * 100;
+
     let gradient = '';
     if (years <= breakEvenYears) {
-      gradient = `linear-gradient(to right, var(--primary) ${currentPercent}%, #ccc ${currentPercent}%)`;
+      gradient = `linear-gradient(to right, 
+        var(--primary) ${currentPercent + thumbOffsetPercent}%, 
+        #ccc ${currentPercent + thumbOffsetPercent}%)`;
     } else {
       gradient = `linear-gradient(to right, 
-        var(--primary) ${payoffPercent}%, 
-        var(--surplus) ${payoffPercent}%, 
-        var(--surplus) ${currentPercent}%, 
-        #ccc ${currentPercent}%)`;
+        var(--primary) ${payoffPercent + thumbOffsetPercent}%, 
+        var(--surplus) ${payoffPercent + thumbOffsetPercent}%, 
+        var(--surplus) ${currentPercent + thumbOffsetPercent}%, 
+        #ccc ${currentPercent + thumbOffsetPercent}%)`;
     }
     slider.style.background = gradient;
 
@@ -348,10 +355,8 @@ input[type="range"]::-moz-range-thumb {
         <h3><span class="question-icon">❤️</span>How much could health care and personal savings grow over ${years} ${years === 1 ? 'year' : 'years'}?</h3>
         <p><strong>Answer:</strong> Cycling infrastructure generates two major types of savings: direct economic benefits for individuals, and long-term reductions in health care costs. Together, these reflect the full value of active transport investments.</p>
         <p>Over <span class="highlight">${years.toLocaleString()}</span> years, ${cyclistCount.toLocaleString()} regular cyclists are projected to save <span class="highlight">$${totalCyclistSavings.toLocaleString()}</span> through reduced transportation costs, improved productivity, and other personal benefits.</p>
-           <p>This is projected to reduce health care costs by <span class="highlight">$${periodHealthCostReduction.toLocaleString()}</span>, based on a long-term return of <span class="highlight">$${multiplier}</span> in system-wide savings for every $1 invested<sup><a href="#note1">1</a></sup>.</p>
-<p>These health care savings reflect the broader public impact of active transport infrastructure. They are not limited to the direct benefits experienced by the estimated <span class="highlight">${cyclistCount.toLocaleString()}</span> regular cyclists.</p>
-
-
+        <p>This is projected to reduce health care costs by <span class="highlight">$${periodHealthCostReduction.toLocaleString()}</span>, based on a long-term return of <span class="highlight">$${multiplier}</span> in system-wide savings for every $1 invested<sup><a href="#note1">1</a></sup>.</p>
+        <p>These health care savings reflect the broader public impact of active transport infrastructure. They are not limited to the direct benefits experienced by the estimated <span class="highlight">${cyclistCount.toLocaleString()}</span> regular cyclists.</p>
         <p class="formula"><em>Formula: Personal Savings = Cyclist Count × Annual Savings × Years</em></p>
         <p class="formula"><em>Formula: Health Care Savings = (Investment × Multiplier ÷ ${lifetimeYears}) × Years</em></p>
       </div>
