@@ -323,8 +323,8 @@
 
 
 
-   <div class="faq-card">
-  <h3><span class="question-icon">❤️</span>How much could health care costs decrease over your selected timeframe?</h3>
+  <div class="faq-card">
+  <h3><span class="question-icon">❤️</span>How much could health care costs decrease over ${years} ${years === 1 ? 'year' : 'years'}?</h3>
   <p><strong>Answer:</strong> Beyond individual savings, cycling infrastructure also drives long-term reductions in health care costs. These benefits are modeled using a conservative multiplier based on peer-reviewed studies.</p>
 
   <p>Over <span class="highlight">${years.toLocaleString()}</span> years, an initial investment of <span class="highlight">$${investment.toLocaleString()}</span> is projected to reduce health care costs by <span class="highlight">$${periodHealthCostReduction.toLocaleString()}</span>, based on a long-term return of <span class="highlight">$${multiplier}</span> per $1 invested<sup><a href="#note1">1</a></sup>.</p>
@@ -337,49 +337,54 @@
 
       <div class="faq-card">
         <h3><span class="question-icon">🏆</span>What is the economic return on cycling infrastructure over ${years} years?</h3>
-        <div class="pnl-block">
-          <div class="pnl-row">
-            <span class="label">Initial Investment</span>
-            <span class="value">$${investment.toLocaleString()}</span>
-          </div>
-          <div class="pnl-row">
-            <span class="label">Cyclist Savings</span>
-            <span class="value highlight">$${totalCyclistSavings.toLocaleString()}</span>
-          </div>
-          <div class="pnl-row">
-            <span class="label">Health Care Savings</span>
-            <span class="value highlight">$${periodHealthCostReduction.toLocaleString()}</span>
-          </div>
-          <div class="pnl-row">
-            <span class="label">Total Benefit</span>
-            <span class="value highlight">$${totalBenefit.toLocaleString()}</span>
-          </div>
-          ${showNetValue ? `
-            <div class="pnl-row">
-              <span class="label">Net Value Accrued</span>
-              <span class="value highlight">$${netBenefit.toLocaleString()}</span>
-            </div>
-          ` : `
-            <div class="pnl-row">
-              <span class="label">Net Value Accrued</span>
-              <span class="value highlight">—</span>
-            </div>
-          `}
-          <div class="pnl-row">
-            <span class="label">Cumulative Return to Date</span>
-            <span class="value highlight">${cumulativeReturn.toFixed(2)}x</span>
-          </div>
-          <div class="pnl-row">
-            <span class="label">Per-Dollar Impact</span>
-            <span class="value highlight">$${perDollarImpact.toFixed(1)} per $1 invested</span>
-          </div>
-        </div>
-        <p class="formula"><em>Formula: Cyclist Savings = Cyclist Count × Annual Savings × Years</em></p>
-        <p class="formula"><em>Formula: Total Benefit = Cyclist Savings + Health Care Savings</em></p>
-        <p class="formula"><em>Formula: Net Value = Total Benefit − Investment</em></p>
-        <p class="formula"><em>Formula: Cumulative Return = Total Benefit ÷ Investment</em></p>
-        <p class="formula"><em>Formula: Per-Dollar Impact = Total Benefit ÷ Investment</em></p>
+        <div class="faq-card">
+  <h3><span class="question-icon">🏆</span>What is the economic return on cycling infrastructure over ${years} years?</h3>
+  <div class="pnl-block">
+    <div class="pnl-row">
+      <span class="label">Initial Investment</span>
+      <span class="value">$${investment.toLocaleString()}</span>
+    </div>
+    <div class="pnl-row">
+      <span class="label">Cyclist Savings</span>
+      <span class="value highlight">$${totalCyclistSavings.toLocaleString()}</span>
+    </div>
+    <div class="pnl-row">
+      <span class="label">Health Care Savings</span>
+      <span class="value highlight">$${periodHealthCostReduction.toLocaleString()}</span>
+    </div>
+    <div class="pnl-row">
+      <span class="label">Total Benefit</span>
+      <span class="value highlight">$${totalBenefit.toLocaleString()}</span>
+    </div>
+    ${showNetValue ? `
+      <div class="pnl-row">
+        <span class="label">Net Value Accrued</span>
+        <span class="value highlight">$${netBenefit.toLocaleString()}</span>
       </div>
+    ` : `
+      <div class="pnl-row">
+        <span class="label">Net Value Accrued</span>
+        <span class="value highlight">—</span>
+      </div>
+    `}
+    <div class="pnl-row">
+      <span class="label">Cumulative Return to Date</span>
+      <span class="value highlight">${cumulativeReturn.toFixed(2)}x</span>
+    </div>
+    <div class="pnl-row">
+      <span class="label">Per-Dollar Impact</span>
+      <span class="value highlight">$${perDollarImpact.toFixed(1)} per $1 invested</span>
+    </div>
+  </div>
+
+  <p class="formula"><em>Formula: Cyclist Savings = Cyclist Count × Annual Savings × Years</em></p>
+  <p class="formula"><em>Formula: Health Care Savings = (Investment × Multiplier ÷ ${lifetimeYears}) × Years</em></p>
+  <p class="formula"><em>Formula: Total Benefit = Cyclist Savings + Health Care Savings</em></p>
+  <p class="formula"><em>Formula: Net Value = Total Benefit − Investment</em></p>
+  <p class="formula"><em>Formula: Cumulative Return = Total Benefit ÷ Investment</em></p>
+  <p class="formula"><em>Formula: Per-Dollar Impact = Total Benefit ÷ Investment</em></p>
+</div>
+
 
       <p class="note" id="note1">
         *Note<sup>1</sup>: The <span class="highlight">$${multiplier}</span> figure is based on total health care savings over a <span class="highlight">${lifetimeYears}-year</span> infrastructure lifespan, as reported in 
