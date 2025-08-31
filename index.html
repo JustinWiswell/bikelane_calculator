@@ -197,17 +197,6 @@
     outline: none;
     transition: background 0.3s ease-in-out;
   }
-
-input[type="range"] {
-  appearance: none;
-  width: 100%;
-  height: 8px;
-  border-radius: 5px;
-  background: linear-gradient(to right, var(--primary) 0%, #ccc 0%);
-  outline: none;
-  position: relative;
-}
-
 input[type="range"]::-webkit-slider-thumb {
   appearance: none;
   width: 20px;
@@ -217,9 +206,7 @@ input[type="range"]::-webkit-slider-thumb {
   cursor: pointer;
   border: none;
   box-shadow: 0 0 2px rgba(0,0,0,0.2);
-  position: relative;
-  left: 50%;
-  transform: translateX(-50%);
+  /* No transform or margin — let it sit flush */
 }
 
 input[type="range"]::-moz-range-thumb {
@@ -229,10 +216,9 @@ input[type="range"]::-moz-range-thumb {
   border-radius: 4px;
   cursor: pointer;
   border: none;
-  position: relative;
-  left: 50%;
-  transform: translateX(-50%);
+  /* No transform or margin */
 }
+
 
 
 
