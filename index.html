@@ -1,444 +1,251 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Cycling Investment Calculator</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<style>
-  :root {
-    --primary: #2e8b57;
-    --accent: #f4f4f4;
-    --text: #333;
-    --thumb: #4CAF50;
-    --surplus: #FFC107;
-  }
-
-  *, *::before, *::after {
-    box-sizing: border-box;
-  }
-
-  body {
-    font-family: 'Segoe UI', sans-serif;
-    background: var(--accent);
-    color: var(--text);
-    margin: 0;
-    padding: 20px;
-  }
-
-  .container {
-    max-width: 750px;
-    margin: auto;
-    background: #fff;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  }
-
-  h2 {
-    color: var(--primary);
-    text-align: center;
-    margin-bottom: 10px;
-  }
-
-  .summary {
-    text-align: center;
-    font-size: 1em;
-    color: #555;
-    margin-bottom: 20px;
-  }
-
-  label {
-    display: block;
-    margin-top: 15px;
-    font-weight: bold;
-  }
-
-  .input-dollar {
-    position: relative;
-    width: 100%;
-  }
-
-  .input-dollar::before {
-    content: "$";
-    position: absolute;
-    left: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #555;
-    font-size: 1em;
-  }
-
-  .input-dollar input,
-  .input-full input,
-  input {
-    width: 100%;
-    padding: 10px 10px 10px 25px;
-    margin-top: 5px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 1em;
-  }
-
-  button {
-    width: 100%;
-    padding: 12px;
-    margin-top: 20px;
-    background: var(--primary);
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    font-size: 1em;
-    cursor: pointer;
-  }
-
-  button:hover {
-    background: #246b45;
-  }
-
-  .faq-card {
-    background: #fafafa;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-    padding: 15px;
-    margin-bottom: 15px;
-    animation: fadeIn 0.6s ease-in-out;
-  }
-
-  #output .faq-card:first-child {
-    margin-top: 20px;
-  }
-
-  .faq-card:nth-child(even) {
-    background: #f0f0f0;
-  }
-
-  .faq-card h3 {
-    margin-top: 0;
-    font-size: 1.1em;
-    display: flex;
-    align-items: center;
-  }
-
-  .question-icon {
-    margin-right: 8px;
-    font-size: 1.2em;
-    color: var(--primary);
-  }
-
-  .highlight,
-  .personal {
-    color: var(--primary);
-    font-weight: bold;
-  }
-
-  .health {
-    color: #1e90ff;
-    font-weight: bold;
-  }
-
-  .total {
-    color: #daa520;
-    font-weight: bold;
-  }
-
-  .formula {
-    font-size: 0.85em;
-    text-transform: uppercase;
-    color: #555;
-  }
-
-  .pnl-block {
-    margin-top: 10px;
-  }
-
-  .pnl-row {
-    display: flex;
-    justify-content: space-between;
-    padding: 8px 0;
-    border-bottom: 1px solid #eee;
-    flex-wrap: wrap;
-  }
-
-  .pnl-row .label,
-  .label {
-    font-weight: bold;
-    flex: 1 1 60%;
-  }
-
-  .pnl-row .value,
-  .value {
-    text-align: right;
-    flex: 1 1 40%;
-    font-weight: bold;
-  }
-
-  @media screen and (max-width: 480px) {
-    .pnl-row {
-      flex-direction: column;
-      align-items: flex-start;
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cycling ROI Calculator</title>
+  <style>
+    :root {
+      --primary: #2e8b57;
+      --surplus: #ffc107;
+      --thumb: #4caf50;
+      --bg: #f9f9f9;
+      --text: #222;
+      --card: #fff;
+      --border: #ddd;
     }
 
-    .pnl-row .value {
-      text-align: left;
-      margin-top: 4px;
+    body {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 2rem;
     }
 
-    .pnl-row:first-child {
-      border-top: 2px solid #ccc;
+    .container {
+      max-width: 600px;
+      margin: auto;
     }
-  }
 
-  input[type="range"] {
-    appearance: none;
-    width: 100%;
-    height: 8px;
-    border-radius: 5px;
-    background: linear-gradient(to right, var(--primary) 0%, #ccc 0%);
-    outline: none;
-    transition: background 0.3s ease-in-out;
-  }
-input[type="range"]::-webkit-slider-thumb {
-  appearance: none;
-  width: 20px;
-  height: 20px;
-  background: var(--thumb);
-  border-radius: 4px;
-  cursor: pointer;
-  border: none;
-  box-shadow: 0 0 2px rgba(0,0,0,0.2);
-  transform: translateX(10px); /* nudges thumb right so leading edge is flush */
-}
+    h1 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      color: var(--primary);
+    }
 
-input[type="range"]::-moz-range-thumb {
-  width: 20px;
-  height: 20px;
-  background: var(--thumb);
-  border-radius: 4px;
-  cursor: pointer;
-  border: none;
-  transform: translateX(10px); /* same fix for Firefox */
+    label {
+      display: block;
+      margin-top: 1.5rem;
+      font-weight: 500;
+      font-size: 0.95rem;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 0.5rem;
+      font-size: 0.95rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      margin-top: 0.5rem;
+    }
+
+    .slider-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 1.5rem;
+      font-size: 0.95rem;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      height: 20px;
+      border-radius: 10px;
+      background: linear-gradient(to right, var(--primary) 0%, #ccc 0%);
+      outline: none;
+      margin-top: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      background: var(--thumb);
+      border-radius: 4px;
+      cursor: pointer;
+      border: none;
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      background: var(--thumb);
+      border-radius: 4px;
+      cursor: pointer;
+      border: none;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-top: 2rem;
+    }
+
+    .card h2 {
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .card p {
+      margin: 0.3rem 0;
+      font-size: 0.95rem;
+    }
+
+    .highlight {
+      font-weight: 600;
+      color: var(--primary);
+    }
+.formula {
+  font-size: 14px !important;
+  color: #999;
+  margin-top: 0.2rem;
+  line-height: 1.2;
+  font-style: italic;
 }
 
 
-  .note {
-    font-size: 0.9em;
-    color: #555;
-    margin-top: 10px;
-  }
-
-  sup a {
-    text-decoration: none;
-    color: inherit;
-  }
-
-  sup a:hover {
-    text-decoration: underline;
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  p, li {
-    line-height: 1.5;
-  }
-</style>
 
 
+
+
+    .citation {
+      font-size: 0.75rem;
+      color: #666;
+      margin-top: 0.5rem;
+    }
+
+    .citation a {
+      color: var(--primary);
+      text-decoration: underline;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
-    <h2>🚴 Cycling Investment Calculator</h2>
-    <p class="summary">
-      This tool estimates the economic and health care benefits of investing in cycling infrastructure.
-      Enter your investment amount and annual savings per cyclist, then use the slider to explore how benefits scale over time.
-    </p>
+    <h1>Cycling ROI Calculator</h1>
 
-    <label for="investment">Investment Amount:</label>
-    <div class="input-dollar">
-      <input type="text" id="investment" value="1,500,000" inputmode="numeric">
+    <label for="investment">Infrastructure Investment ($)</label>
+    <input type="text" id="investment" value="1500000" />
+
+    <label for="savings">Annual Savings per Cyclist ($)</label>
+    <input type="text" id="savings" value="4000" />
+
+    <div class="slider-label">
+      <label for="years">Years of Impact</label>
+      <span id="year-label">5 years</span>
     </div>
-
-    <label for="savings">Annual Savings per Cyclist:</label>
-    <div class="input-dollar">
-      <input type="text" id="savings" value="4,000" inputmode="numeric">
-    </div>
-
-    <label for="years">Select Timeframe (Years):</label>
-    <input type="range" id="years" min="1" max="20" value="5" oninput="updateSliderLabel(this.value)">
-    <span id="year-label">5 years</span>
+    <input type="range" id="years" min="1" max="20" value="5" />
 
     <div id="output"></div>
   </div>
 
-<script>
-  function formatNumberWithCommas(value) {
-    const numericValue = value.replace(/\D/g, '');
-    if (!numericValue) return '';
-    return numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-  }
+  <script>
+    function formatNumberWithCommas(value) {
+      const numericValue = value.replace(/\D/g, '');
+      return numericValue ? numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ',') : '';
+    }
 
-  ['investment', 'savings'].forEach(id => {
-    const input = document.getElementById(id);
-    input.addEventListener('input', (e) => {
-      const formatted = formatNumberWithCommas(e.target.value);
-      e.target.value = formatted;
-      e.target.setSelectionRange(e.target.value.length, e.target.value.length);
+    ['investment', 'savings'].forEach(id => {
+      const input = document.getElementById(id);
+      input.addEventListener('input', (e) => {
+        e.target.value = formatNumberWithCommas(e.target.value);
+        calculate();
+      });
+    });
+
+    document.getElementById('years').addEventListener('input', (e) => {
+      document.getElementById('year-label').textContent = `${e.target.value} years`;
       calculate();
     });
-    input.addEventListener('blur', (e) => {
-      e.target.value = formatNumberWithCommas(e.target.value);
-    });
-  });
 
-  function updateSliderLabel(value) {
-    document.getElementById('year-label').textContent = `${value} years`;
-    calculate();
-  }
+    function calculate() {
+      const investment = parseFloat(document.getElementById('investment').value.replace(/,/g, '')) || 0;
+      const savings = parseFloat(document.getElementById('savings').value.replace(/,/g, '')) || 0;
+      const years = parseInt(document.getElementById('years').value);
 
-  function calculate() {
-    const investment = parseFloat(document.getElementById('investment').value.replace(/,/g, '')) || 0;
-    const savings = parseFloat(document.getElementById('savings').value.replace(/,/g, '')) || 0;
-    const years = parseFloat(document.getElementById('years').value) || 0;
+      const breakEvenYears = 5;
+      const multiplier = 3;
+      const lifetimeYears = 20;
 
-    const multiplier = 3;
-    const lifetimeYears = 20;
-    const breakEvenYears = 5;
+      const cyclistCount = Math.round(investment / (savings * breakEvenYears));
+      const totalCyclistSavings = cyclistCount * savings * years;
+      const healthCareSavings = (investment * multiplier / lifetimeYears) * years;
+      const totalBenefit = totalCyclistSavings + healthCareSavings;
+      const netBenefit = totalBenefit - investment;
+      const cumulativeReturn = totalBenefit / investment;
 
-    const cyclistCount = Math.round(investment / (savings * breakEvenYears));
-    const totalCyclistSavings = cyclistCount * savings * years;
-    const lifetimeHealthCostReduction = investment * multiplier;
-    const annualHealthCostReduction = lifetimeHealthCostReduction / lifetimeYears;
-    const periodHealthCostReduction = annualHealthCostReduction * years;
-    const totalBenefit = totalCyclistSavings + periodHealthCostReduction;
-    const netBenefit = totalBenefit - investment;
-    const cumulativeReturn = totalBenefit / investment;
-    const perDollarImpact = totalBenefit / investment;
-    const showNetValue = netBenefit > 0;
+      const slider = document.getElementById('years');
+      const maxYears = parseInt(slider.max);
+      const currentPercent = (years / maxYears) * 100;
+      const payoffPercent = (breakEvenYears / maxYears) * 100;
+      const sliderWidth = slider.offsetWidth || 300;
+      const thumbWidthPx = 20;
+      const thumbOffsetPercent = (thumbWidthPx / sliderWidth) * 100;
+      const fillEnd = Math.min(currentPercent + thumbOffsetPercent, 100);
 
-    // 🎨 Slider gradient: green to break-even, amber beyond
-   const slider = document.getElementById('years');
-const maxYears = parseInt(slider.max);
-const payoffPercent = Math.round((breakEvenYears / maxYears) * 100);
-const currentPercent = Math.round((years / maxYears) * 100);
+      let gradient = '';
+      if (years <= breakEvenYears) {
+        gradient = `linear-gradient(to right, var(--primary) ${fillEnd}%, #ccc ${fillEnd}%)`;
+      } else {
+        gradient = `linear-gradient(to right, 
+          var(--primary) ${payoffPercent}%, 
+          var(--surplus) ${payoffPercent}%, 
+          var(--surplus) ${fillEnd}%, 
+          #ccc ${fillEnd}%)`;
+      }
+      slider.style.background = gradient;
 
-// Dynamically calculate thumb width
-let thumbWidthPx = 20; // fallback
-try {
-  const sliderStyles = window.getComputedStyle(slider);
-  const thumbStyle = sliderStyles.getPropertyValue('--thumb-width');
-  if (thumbStyle) {
-    thumbWidthPx = parseInt(thumbStyle);
-  }
-} catch (e) {
-  // fallback remains 20px
-}
-
-const sliderWidth = slider.offsetWidth || 300;
-const thumbOffsetPercent = (thumbWidthPx / sliderWidth) * 100;
-
-// Gradient logic: amber bar ends under thumb
-let gradient = '';
-if (years <= breakEvenYears) {
-  gradient = `linear-gradient(to right, 
-    var(--primary) ${currentPercent + thumbOffsetPercent}%, 
-    #ccc ${currentPercent + thumbOffsetPercent}%)`;
-} else {
-  gradient = `linear-gradient(to right, 
-    var(--primary) ${payoffPercent}%, 
-    var(--surplus) ${payoffPercent}%, 
-    var(--surplus) ${currentPercent + thumbOffsetPercent}%, 
-    #ccc ${currentPercent + thumbOffsetPercent}%)`;
-}
-
-slider.style.background = gradient;
-
-
-    document.getElementById('output').innerHTML = `
-      <div class="faq-card">
-        <h3><span class="question-icon">💡</span>How many cyclists are assumed in this model?</h3>
-        <p><strong>Answer:</strong> This model assumes the city attracts <span class="highlight">${cyclistCount.toLocaleString()}</span> regular cyclists. That’s the number needed to break even on a <span class="highlight">$${investment.toLocaleString()}</span> investment over <span class="highlight">${breakEvenYears}</span> years, with each cyclist saving <span class="highlight">$${savings.toLocaleString()}</span> annually.</p>
-        <p>This fixed cyclist count is used to calculate cumulative savings across all timeframes selected below.</p>
-        <p><strong>Why it’s useful:</strong> This break-even cyclist count gives cities a clear planning target. If ${cyclistCount} regular riders are sustained over ${breakEvenYears} years, the investment pays for itself. It serves as a conservative benchmark based on direct economic savings per rider.</p>
-        <p class="formula"><em>Formula: Cyclist Count = Investment ÷ (Annual Savings × ${breakEvenYears})</em></p>
-      </div>
-
-      <div class="faq-card">
-        <h3><span class="question-icon">❤️</span>How much could health care and personal savings grow over ${years} ${years === 1 ? 'year' : 'years'}?</h3>
-        <p><strong>Answer:</strong> Cycling infrastructure generates two major types of savings: direct economic benefits for individuals, and long-term reductions in health care costs. Together, these reflect the full value of active transport investments.</p>
-        <p>Over <span class="highlight">${years.toLocaleString()}</span> years, ${cyclistCount.toLocaleString()} regular cyclists are projected to save <span class="highlight">$${totalCyclistSavings.toLocaleString()}</span> through reduced transportation costs, improved productivity, and other personal benefits.</p>
-        <p>This is projected to reduce health care costs by <span class="highlight">$${periodHealthCostReduction.toLocaleString()}</span>, based on a long-term return of <span class="highlight">$${multiplier}</span> in system-wide savings for every $1 invested<sup><a href="#note1">1</a></sup>.</p>
-        <p>These health care savings reflect the broader public impact of active transport infrastructure. They are not limited to the direct benefits experienced by the estimated <span class="highlight">${cyclistCount.toLocaleString()}</span> regular cyclists.</p>
-        <p class="formula"><em>Formula: Personal Savings = Cyclist Count × Annual Savings × Years</em></p>
-        <p class="formula"><em>Formula: Health Care Savings = (Investment × Multiplier ÷ ${lifetimeYears}) × Years</em></p>
-      </div>
-
-      <div class="faq-card">
-        <h3><span class="question-icon">🏆</span>What is the economic return on cycling infrastructure over ${years} years?</h3>
-        <div class="pnl-block">
-          <div class="pnl-row">
-            <span class="label">Initial Investment</span>
-            <span class="value">$${investment.toLocaleString()}</span>
-          </div>
-          <div class="pnl-row">
-            <span class="label">Cyclist Savings</span>
-            <span class="value highlight">$${totalCyclistSavings.toLocaleString()}</span>
-          </div>
-          <div class="pnl-row">
-            <span class="label">Health Care Savings</span>
-            <span class="value highlight">$${periodHealthCostReduction.toLocaleString()}</span>
-          </div>
-          <div class="pnl-row">
-            <span class="label">Total Benefit</span>
-            <span class="value highlight">$${totalBenefit.toLocaleString()}</span>
-          </div>
-          ${showNetValue ? `
-            <div class="pnl-row">
-              <span class="label">Net Value Accrued</span>
-              <span class="value highlight">$${netBenefit.toLocaleString()}</span>
-            </div>
-          ` : `
-            <div class="pnl-row">
-              <span class="label">Net Value Accrued</span>
-              <span class="value highlight">—</span>
-            </div>
-          `}
-          <div class="pnl-row">
-            <span class="label">Cumulative Return to Date</span>
-            <span class="value highlight">${cumulativeReturn.toFixed(2)}x</span>
-          </div>
-          <div class="pnl-row">
-            <span class="label">Per-Dollar Impact</span>
-            <span class="value highlight">$${perDollarImpact.toFixed(1)} per $1 invested</span>
-          </div>
+      document.getElementById('output').innerHTML = `
+        <div class="card">
+          <h2>Assumed Cyclists</h2>
+          <p><span class="highlight">${cyclistCount.toLocaleString()}</span> regular cyclists needed to break even over ${breakEvenYears} years.</p>
+          <p class="formula"><em>Formula: Cyclist Count = Investment ÷ (Annual Savings × ${breakEvenYears})</em></p>
         </div>
-        <p class="formula"><em>Formula: Cyclist Savings = Cyclist Count × Annual Savings × Years</em></p>
-        <p class="formula"><em>Formula: Health Care Savings = (Investment × Multiplier ÷ ${lifetimeYears}) × Years</em></p>
-        <p class="formula"><em>Formula: Total Benefit = Cyclist Savings + Health Care Savings</em></p>
-        <p class="formula"><em>Formula: Net Value = Total Benefit − Investment</em></p>
-        <p class="formula"><em>Formula: Cumulative Return = Total Benefit ÷ Investment</em></p>
-        <p class="formula"><em>Formula: Per-Dollar Impact = Total Benefit ÷ Investment</em></p>
-      </div>
 
-      <p class="note" id="note1">
-        *Note<sup>1</sup>: The <span class="highlight">$${multiplier}</span> figure is based on total health care savings over a <span class="highlight">${lifetimeYears}-year</span> infrastructure lifespan, as reported in 
-        <a href="https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0246419" target="_blank">peer‑reviewed studies</a>.  
-        This reflects an <strong>annualized health care cost reduction of $225 per $1 million invested</strong>.  
-        The savings shown here are scaled proportionally to your selected timeframe for illustration.*
-      </p>
-      <p class="note" id="note2">
-        *Note<sup>2</sup>: Infrastructure investments typically yield modest returns in early years, with benefits compounding over time due to sustained behavioral adoption, health improvements, and long-term cost avoidance. See 
-        <a href="https://www.sciencedirect.com/science/article/pii/S2214140518301485" target="_blank">economic modeling of active transport investments</a> for more.*
-      </p>
-    `;
-  }
+        <div class="card">
+          <h2>Projected Savings</h2>
+          <p>Personal savings: <span class="highlight">$${totalCyclistSavings.toLocaleString()}</span></p>
+          <p>Health care savings: <span class="highlight">$${healthCareSavings.toLocaleString()}</span></p>
+          <p class="formula"><em>Formula: Personal Savings = Cyclist Count × Annual Savings × Years</em></p>
+          <p class="formula"><em>Formula: Health Care Savings = (Investment × ${multiplier} ÷ ${lifetimeYears}) × Years</em></p>
+          <p class="citation">
+            <small>
+              *Based on findings from the 
+              <a href="https://itdp.org/publication/the-case-for-cycling-infrastructure-investments/" target="_blank">CyclingMax Tool report</a> by ITDP and the World Bank, and 
+              <a href="https://cyclingmagazine.ca/sections/healthnutrition/for-these-canadian-cities-the-health-benefits-of-cycling-infrastructure-significantly-outweighed-the-cost-of-new-bike-lanes/" target="_blank">Simon Fraser University’s study</a> on Canadian cities.
+            </small>
+          </p>
+        </div>
 
-  window.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('years').value = 5;
-    updateSliderLabel(5);
-  });
-</script>
+        <div class="card">
+          <h2>Economic Return</h2>
+          <p>Total benefit: <span class="highlight">$${totalBenefit.toLocaleString()}</span></p>
+                      <p>Net value: <span class="highlight">${netBenefit > 0 ? `$${netBenefit.toLocaleString()}` : '—'}</span></p>
+          <p>Return: <span class="highlight">${cumulativeReturn.toFixed(2)}x</span></p>
+          <p class="formula"><em>Formula: Total Benefit = Personal Savings + Health Care Savings</em></p>
+          <p class="formula"><em>Formula: Net Value = Total Benefit − Investment</em></p>
+          <p class="formula"><em>Formula: Return = Total Benefit ÷ Investment</em></p>
+        </div>
+      `;
+    }
 
+    window.addEventListener('DOMContentLoaded', () => {
+      calculate();
+    });
+  </script>
 </body>
 </html>
