@@ -4,227 +4,250 @@
   <meta charset="UTF-8">
   <title>Cycling Investment Calculator</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    :root {
-      --primary: #2e8b57;
-      --accent: #f4f4f4;
-      --text: #333;
-    }
-    *, *::before, *::after {
-      box-sizing: border-box;
-    }
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background-color: var(--accent);
-      color: var(--text);
-      margin: 0;
-      padding: 20px;
-    }
-    .container {
-      max-width: 750px;
-      margin: auto;
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    h2 {
-      color: var(--primary);
-      text-align: center;
-      margin-bottom: 10px;
-    }
-    .summary {
-      text-align: center;
-      font-size: 1em;
-      color: #555;
-      margin-bottom: 20px;
-    }
-    label {
-      display: block;
-      margin-top: 15px;
-      font-weight: bold;
-    }
-    .input-dollar {
-      position: relative;
-      display: inline-block;
-      width: 100%;
-    }
-    .input-dollar::before {
-      content: "$";
-      position: absolute;
-      left: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: #555;
-      font-size: 1em;
-    }
-    .input-dollar input {
-      padding-left: 25px;
-      width: 100%;
-    }
-    .input-full {
-      display: inline-block;
-      width: 100%;
-    }
-    input {
-      width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      font-size: 1em;
-    }
-    button {
-      width: 100%;
-      padding: 12px;
-      margin-top: 20px;
-      background-color: var(--primary);
-      color: white;
-      border: none;
-      border-radius: 5px;
-      font-size: 1em;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #246b45;
-    }
+<style>
+  :root {
+    --primary: #2e8b57;
+    --accent: #f4f4f4;
+    --text: #333;
+    --thumb: #4CAF50;
+    --surplus: #FFC107;
+  }
 
-    .faq-card {
-      background-color: #fafafa;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-      padding: 15px;
-      margin-bottom: 15px;
-      animation: fadeIn 0.6s ease-in-out;
-    }
-    #output .faq-card:first-child {
-      margin-top: 20px;
-    }
-    .faq-card:nth-child(even) {
-      background-color: #f0f0f0;
-    }
-    .faq-card h3 {
-      margin-top: 0;
-      font-size: 1.1em;
-    }
-    .question-icon {
-      margin-right: 8px;
-      font-size: 1.2em;
-      color: var(--primary);
-    }
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
 
-    .highlight {
-      font-weight: bold;
-      color: #2e8b57;
-    }
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: var(--accent);
+    color: var(--text);
+    margin: 0;
+    padding: 20px;
+  }
 
-    .personal { color: #2e8b57; font-weight: bold; }
-    .health { color: #1e90ff; font-weight: bold; }
-    .total { color: #daa520; font-weight: bold; }
+  .container {
+    max-width: 750px;
+    margin: auto;
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
 
-    .formula {
-      font-size: 0.85em;
-      text-transform: uppercase;
-      color: #555;
-    }
-.pnl-block {
-  margin-top: 10px;
-}
+  h2 {
+    color: var(--primary);
+    text-align: center;
+    margin-bottom: 10px;
+  }
 
-.pnl-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 8px 0;
-  border-bottom: 1px solid #eee;
-  flex-wrap: wrap;
-}
+  .summary {
+    text-align: center;
+    font-size: 1em;
+    color: #555;
+    margin-bottom: 20px;
+  }
 
-.pnl-row .label {
-  font-weight: bold;
-  flex: 1 1 60%;
-}
+  label {
+    display: block;
+    margin-top: 15px;
+    font-weight: bold;
+  }
 
-.pnl-row .value {
-  text-align: right;
-  flex: 1 1 40%;
-  font-weight: bold;
-}
+  .input-dollar {
+    position: relative;
+    width: 100%;
+  }
 
-@media screen and (max-width: 480px) {
+  .input-dollar::before {
+    content: "$";
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #555;
+    font-size: 1em;
+  }
+
+  .input-dollar input,
+  .input-full input,
+  input {
+    width: 100%;
+    padding: 10px 10px 10px 25px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1em;
+  }
+
+  button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 20px;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 1em;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background: #246b45;
+  }
+
+  .faq-card {
+    background: #fafafa;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    padding: 15px;
+    margin-bottom: 15px;
+    animation: fadeIn 0.6s ease-in-out;
+  }
+
+  #output .faq-card:first-child {
+    margin-top: 20px;
+  }
+
+  .faq-card:nth-child(even) {
+    background: #f0f0f0;
+  }
+
+  .faq-card h3 {
+    margin-top: 0;
+    font-size: 1.1em;
+    display: flex;
+    align-items: center;
+  }
+
+  .question-icon {
+    margin-right: 8px;
+    font-size: 1.2em;
+    color: var(--primary);
+  }
+
+  .highlight,
+  .personal {
+    color: var(--primary);
+    font-weight: bold;
+  }
+
+  .health {
+    color: #1e90ff;
+    font-weight: bold;
+  }
+
+  .total {
+    color: #daa520;
+    font-weight: bold;
+  }
+
+  .formula {
+    font-size: 0.85em;
+    text-transform: uppercase;
+    color: #555;
+  }
+
+  .pnl-block {
+    margin-top: 10px;
+  }
+
   .pnl-row {
-    flex-direction: column;
-    align-items: flex-start;
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+    flex-wrap: wrap;
   }
 
-  .pnl-row .value {
-    text-align: left;
-    margin-top: 4px;
+  .pnl-row .label,
+  .label {
+    font-weight: bold;
+    flex: 1 1 60%;
   }
-  .pnl-row:first-child {
-  border-top: 2px solid #ccc;
-}
-}
-input[type="range"] {
-  appearance: none;
-  height: 8px;
-  border-radius: 5px;
-  background: linear-gradient(to right, #2e8b57 0%, #ccc 0%);
-  outline: none;
-  transition: background 0.3s ease-in-out;
-}
 
-input[type="range"]::-webkit-slider-thumb {
+  .pnl-row .value,
+  .value {
+    text-align: right;
+    flex: 1 1 40%;
+    font-weight: bold;
+  }
+
+  @media screen and (max-width: 480px) {
+    .pnl-row {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .pnl-row .value {
+      text-align: left;
+      margin-top: 4px;
+    }
+
+    .pnl-row:first-child {
+      border-top: 2px solid #ccc;
+    }
+  }
+
+  input[type="range"] {
+    appearance: none;
+    width: 100%;
+    height: 8px;
+    border-radius: 5px;
+    background: linear-gradient(to right, var(--primary) 0%, #ccc 0%);
+    outline: none;
+    transition: background 0.3s ease-in-out;
+  }
+
+ input[type="range"]::-webkit-slider-thumb {
   appearance: none;
   width: 20px;
   height: 20px;
-  background: var(--primary);
-  border-radius: 50%;
+  background: var(--thumb);
+  border-radius: 4px;
   cursor: pointer;
   border: none;
   box-shadow: 0 0 2px rgba(0,0,0,0.2);
+  transform: translateX(10px); /* nudges thumb right */
 }
 
 input[type="range"]::-moz-range-thumb {
   width: 20px;
   height: 20px;
-  background: var(--primary);
-  border-radius: 50%;
+  background: var(--thumb);
+  border-radius: 4px;
   cursor: pointer;
   border: none;
+  transform: translateX(10px); /* Firefox fix */
 }
 
-.label {
-  font-weight: bold;
-}
-.value {
-  text-align: right;
-  font-weight: bold;
-}
-.highlight {
-  color: #2e8b57;
-}
 
-    .note {
-      font-size: 0.9em;
-      color: #555;
-      margin-top: 10px;
-    }
-    sup a {
-      text-decoration: none;
-      color: inherit;
-    }
-    sup a:hover {
-      text-decoration: underline;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    p, li {
-      line-height: 1.5;
-    }
 
-  </style>
+  .note {
+    font-size: 0.9em;
+    color: #555;
+    margin-top: 10px;
+  }
+
+  sup a {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  sup a:hover {
+    text-decoration: underline;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  p, li {
+    line-height: 1.5;
+  }
+</style>
+
+
 </head>
 <body>
   <div class="container">
@@ -296,21 +319,20 @@ input[type="range"]::-moz-range-thumb {
     const perDollarImpact = totalBenefit / investment;
     const showNetValue = netBenefit > 0;
 
-    // 🎨 Slider gradient: green to break-even, teal beyond
+    // 🎨 Slider gradient: green to break-even, amber beyond
     const slider = document.getElementById('years');
     const maxYears = parseInt(slider.max);
-    const payoffYears = breakEvenYears;
-    const payoffPercent = Math.round((payoffYears / maxYears) * 100);
+    const payoffPercent = Math.round((breakEvenYears / maxYears) * 100);
     const currentPercent = Math.round((years / maxYears) * 100);
 
     let gradient = '';
-    if (years <= payoffYears) {
-      gradient = `linear-gradient(to right, #2e8b57 ${currentPercent}%, #ccc ${currentPercent}%)`;
+    if (years <= breakEvenYears) {
+      gradient = `linear-gradient(to right, var(--primary) ${currentPercent}%, #ccc ${currentPercent}%)`;
     } else {
       gradient = `linear-gradient(to right, 
-        #2e8b57 ${payoffPercent}%, 
-        #00bfa5 ${payoffPercent}%, 
-        #00bfa5 ${currentPercent}%, 
+        var(--primary) ${payoffPercent}%, 
+        var(--surplus) ${payoffPercent}%, 
+        var(--surplus) ${currentPercent}%, 
         #ccc ${currentPercent}%)`;
     }
     slider.style.background = gradient;
@@ -387,7 +409,7 @@ input[type="range"]::-moz-range-thumb {
         The savings shown here are scaled proportionally to your selected timeframe for illustration.*
       </p>
       <p class="note" id="note2">
-        *Note<sup>2</sup>: Infrastructure investments typically yield modest returns in improvements, and long-term cost avoidance. See 
+        *Note<sup>2</sup>: Infrastructure investments typically yield modest returns in early years, with benefits compounding over time due to sustained behavioral adoption, health improvements, and long-term cost avoidance. See 
         <a href="https://www.sciencedirect.com/science/article/pii/S2214140518301485" target="_blank">economic modeling of active transport investments</a> for more.*
       </p>
     `;
@@ -398,11 +420,6 @@ input[type="range"]::-moz-range-thumb {
     updateSliderLabel(5);
   });
 </script>
-
-
-
-
-
 
 </body>
 </html>
