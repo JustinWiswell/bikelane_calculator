@@ -129,10 +129,10 @@ input[type="range"] {
   <div class="container">
     <h1>Cycling ROI Calculator</h1>
 
-    <label for="investment">Infrastructure Investment ($)</label>
+    <label for="investment">One-time Infrastructure Investment</label>
     <input type="text" id="investment" value="1500000" />
 
-    <label for="savings">Annual Savings per Cyclist ($)</label>
+    <label for="savings">Annual Savings per Cyclist</label>
     <input type="text" id="savings" value="4000" />
 
     <div class="slider-label">
@@ -143,17 +143,22 @@ input[type="range"] {
 
     <div id="output"></div>
   </div>
+<script>
+  function formatCurrency(value) {
+    const numeric = value.replace(/[^\d]/g, '');
+    if (!numeric) return '';
+    return `$${parseInt(numeric, 10).toLocaleString()}`;
+  }
 
- <script>
-  function formatNumberWithCommas(value) {
-    const numericValue = value.replace(/\D/g, '');
-    return numericValue ? numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ',') : '';
+  function getRawNumber(value) {
+    return parseFloat(value.replace(/[^\d]/g, '')) || 0;
   }
 
   ['investment', 'savings'].forEach(id => {
     const input = document.getElementById(id);
     input.addEventListener('input', (e) => {
-      e.target.value = formatNumberWithCommas(e.target.value);
+      const raw = getRawNumber(e.target.value);
+      e.target.value = formatCurrency(raw.toString());
       requestAnimationFrame(() => calculate());
     });
   });
@@ -164,8 +169,8 @@ input[type="range"] {
   });
 
   function calculate() {
-    const investment = parseFloat(document.getElementById('investment').value.replace(/,/g, '')) || 0;
-    const savings = parseFloat(document.getElementById('savings').value.replace(/,/g, '')) || 0;
+    const investment = getRawNumber(document.getElementById('investment').value);
+    const savings = getRawNumber(document.getElementById('savings').value);
     const years = parseInt(document.getElementById('years').value);
 
     const breakEvenYears = 5;
@@ -178,29 +183,6 @@ input[type="range"] {
     const totalBenefit = totalCyclistSavings + healthCareSavings;
     const netBenefit = totalBenefit - investment;
     const cumulativeReturn = totalBenefit / investment;
-
-    const slider = document.getElementById('years');
-    let sliderWidth = slider.offsetWidth;
-    if (sliderWidth === 0) sliderWidth = 300; // fallback for desktop
-
-    const maxYears = parseInt(slider.max);
-    const currentPercent = (years / maxYears) * 100;
-    const payoffPercent = (breakEvenYears / maxYears) * 100;
-    const thumbWidthPx = 20;
-    const thumbOffsetPercent = (thumbWidthPx / sliderWidth) * 100;
-    const fillEnd = Math.min(currentPercent + thumbOffsetPercent, 100);
-
-   let gradient = '';
-if (years <= breakEvenYears) {
-  gradient = `linear-gradient(to right, var(--primary) ${fillEnd}%, #ccc ${fillEnd}%)`;
-} else {
-  gradient = `linear-gradient(to right, 
-    var(--primary) ${payoffPercent}%, 
-    var(--surplus) ${payoffPercent}%, 
-    var(--surplus) ${fillEnd}%, 
-    #ccc ${fillEnd}%)`;
-}
-slider.style.background = gradient;
 
     document.getElementById('output').innerHTML = `
       <div class="card">
@@ -236,10 +218,18 @@ slider.style.background = gradient;
     `;
   }
 
-  window.addEventListener('DOMContentLoaded', () => {
-    requestAnimationFrame(() => calculate());
+window.addEventListener('DOMContentLoaded', () => {
+  // Format default values
+  ['investment', 'savings'].forEach(id => {
+    const input = document.getElementById(id);
+    const raw = input.value.replace(/[^\d]/g, '');
+    input.value = formatCurrency(raw);
   });
+
+  requestAnimationFrame(() => calculate());
+});
 </script>
+
 
 </body>
 </html>
