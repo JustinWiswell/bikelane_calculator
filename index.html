@@ -70,13 +70,13 @@
       font-size: 0.95rem;
     }
 
-    input[type="range"] {
-      height: 20px;
-      border-radius: 10px;
-      background: linear-gradient(to right, var(--primary) 0%, #ccc 0%);
-      outline: none;
-      margin: 0.5rem 0;
-    }
+input[type="range"] {
+  width: 100%;
+  height: 20px;
+  border-radius: 10px;
+  outline: none;
+  margin: 0.5rem 0;
+}
 
     input[type="range"]::-webkit-slider-thumb {
       appearance: none;
@@ -206,17 +206,17 @@
     const thumbOffsetPercent = (thumbWidthPx / sliderWidth) * 100;
     const fillEnd = Math.min(currentPercent + thumbOffsetPercent, 100);
 
-    let gradient = '';
-    if (years <= breakEvenYears) {
-      gradient = `linear-gradient(to right, var(--primary) ${fillEnd}%, #ccc ${fillEnd}%)`;
-    } else {
-      gradient = `linear-gradient(to right, 
-        var(--primary) ${payoffPercent}%, 
-        var(--surplus) ${payoffPercent}%, 
-        var(--surplus) ${fillEnd}%, 
-        #ccc ${fillEnd}%)`;
-    }
-    slider.style.background = gradient;
+   let gradient = '';
+if (years <= breakEvenYears) {
+  gradient = `linear-gradient(to right, var(--primary) ${fillEnd}%, #ccc ${fillEnd}%)`;
+} else {
+  gradient = `linear-gradient(to right, 
+    var(--primary) ${payoffPercent}%, 
+    var(--surplus) ${payoffPercent}%, 
+    var(--surplus) ${fillEnd}%, 
+    #ccc ${fillEnd}%)`;
+}
+slider.style.background = gradient;
 
     document.getElementById('output').innerHTML = `
       <div class="card">
