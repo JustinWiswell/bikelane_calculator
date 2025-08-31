@@ -160,101 +160,102 @@
     <div id="output"></div>
   </div>
 
-  <script>
-    function formatNumberWithCommas(value) {
-      const numericValue = value.replace(/\D/g, '');
-      return numericValue ? numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ',') : '';
+ <script>
+  function formatNumberWithCommas(value) {
+    const numericValue = value.replace(/\D/g, '');
+    return numericValue ? numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ',') : '';
+  }
+
+  ['investment', 'savings'].forEach(id => {
+    const input = document.getElementById(id);
+    input.addEventListener('input', (e) => {
+      e.target.value = formatNumberWithCommas(e.target.value);
+      requestAnimationFrame(() => calculate());
+    });
+  });
+
+  document.getElementById('years').addEventListener('input', (e) => {
+    document.getElementById('year-label').textContent = `${e.target.value} years`;
+    requestAnimationFrame(() => calculate());
+  });
+
+  function calculate() {
+    const investment = parseFloat(document.getElementById('investment').value.replace(/,/g, '')) || 0;
+    const savings = parseFloat(document.getElementById('savings').value.replace(/,/g, '')) || 0;
+    const years = parseInt(document.getElementById('years').value);
+
+    const breakEvenYears = 5;
+    const multiplier = 3;
+    const lifetimeYears = 20;
+
+    const cyclistCount = Math.round(investment / (savings * breakEvenYears));
+    const totalCyclistSavings = cyclistCount * savings * years;
+    const healthCareSavings = (investment * multiplier / lifetimeYears) * years;
+    const totalBenefit = totalCyclistSavings + healthCareSavings;
+    const netBenefit = totalBenefit - investment;
+    const cumulativeReturn = totalBenefit / investment;
+
+    const slider = document.getElementById('years');
+    let sliderWidth = slider.offsetWidth;
+    if (sliderWidth === 0) sliderWidth = 300; // fallback for desktop
+
+    const maxYears = parseInt(slider.max);
+    const currentPercent = (years / maxYears) * 100;
+    const payoffPercent = (breakEvenYears / maxYears) * 100;
+    const thumbWidthPx = 20;
+    const thumbOffsetPercent = (thumbWidthPx / sliderWidth) * 100;
+    const fillEnd = Math.min(currentPercent + thumbOffsetPercent, 100);
+
+    let gradient = '';
+    if (years <= breakEvenYears) {
+      gradient = `linear-gradient(to right, var(--primary) ${fillEnd}%, #ccc ${fillEnd}%)`;
+    } else {
+      gradient = `linear-gradient(to right, 
+        var(--primary) ${payoffPercent}%, 
+        var(--surplus) ${payoffPercent}%, 
+        var(--surplus) ${fillEnd}%, 
+        #ccc ${fillEnd}%)`;
     }
+    slider.style.background = gradient;
 
-    ['investment', 'savings'].forEach(id => {
-      const input = document.getElementById(id);
-      input.addEventListener('input', (e) => {
-        e.target.value = formatNumberWithCommas(e.target.value);
-        calculate();
-      });
-    });
+    document.getElementById('output').innerHTML = `
+      <div class="card">
+        <h2>Assumed Cyclists</h2>
+        <p><span class="highlight">${cyclistCount.toLocaleString()}</span> regular cyclists needed to break even over ${breakEvenYears} years.</p>
+        <p class="formula"><em>Formula: Cyclist Count = Investment ÷ (Annual Savings × ${breakEvenYears})</em></p>
+      </div>
 
-    document.getElementById('years').addEventListener('input', (e) => {
-      document.getElementById('year-label').textContent = `${e.target.value} years`;
-      calculate();
-    });
+      <div class="card">
+        <h2>Projected Savings over ${years} years</h2>
+        <p>Personal savings: <span class="highlight">$${totalCyclistSavings.toLocaleString()}</span></p>
+        <p>Health care savings: <span class="highlight">$${healthCareSavings.toLocaleString()}</span></p>
+        <p class="formula"><em>Formula: Personal Savings = Cyclist Count × Annual Savings × Years</em></p>
+        <p class="formula"><em>Formula: Health Care Savings = (Investment × ${multiplier} ÷ ${lifetimeYears}) × Years</em></p>
+        <p class="citation">
+          <small>
+            *Based on findings from the 
+            <a href="https://itdp.org/publication/the-case-for-cycling-infrastructure-investments/" target="_blank">CyclingMax Tool report</a> by ITDP and the World Bank, and 
+            <a href="https://cyclingmagazine.ca/sections/healthnutrition/for-these-canadian-cities-the-health-benefits-of-cycling-infrastructure-significantly-outweighed-the-cost-of-new-bike-lanes/" target="_blank">Simon Fraser University’s study</a> on Canadian cities.
+          </small>
+        </p>
+      </div>
 
-    function calculate() {
-      const investment = parseFloat(document.getElementById('investment').value.replace(/,/g, '')) || 0;
-      const savings = parseFloat(document.getElementById('savings').value.replace(/,/g, '')) || 0;
-      const years = parseInt(document.getElementById('years').value);
+      <div class="card">
+        <h2>Economic Return after ${years} years</h2>
+        <p>Total benefit: <span class="highlight">$${totalBenefit.toLocaleString()}</span></p>
+        <p>Net value: <span class="highlight">${netBenefit > 0 ? `$${netBenefit.toLocaleString()}` : '—'}</span></p>
+        <p>Return: <span class="highlight">${cumulativeReturn.toFixed(2)}x</span></p>
+        <p class="formula"><em>Formula: Total Benefit = Personal Savings + Health Care Savings</em></p>
+        <p class="formula"><em>Formula: Net Value = Total Benefit − Investment</em></p>
+        <p class="formula"><em>Formula: Return = Total Benefit ÷ Investment</em></p>
+      </div>
+    `;
+  }
 
-      const breakEvenYears = 5;
-      const multiplier = 3;
-      const lifetimeYears = 20;
+  window.addEventListener('DOMContentLoaded', () => {
+    requestAnimationFrame(() => calculate());
+  });
+</script>
 
-      const cyclistCount = Math.round(investment / (savings * breakEvenYears));
-      const totalCyclistSavings = cyclistCount * savings * years;
-      const healthCareSavings = (investment * multiplier / lifetimeYears) * years;
-      const totalBenefit = totalCyclistSavings + healthCareSavings;
-      const netBenefit = totalBenefit - investment;
-      const cumulativeReturn = totalBenefit / investment;
-
-      const slider = document.getElementById('years');
-      let sliderWidth = slider.offsetWidth;
-      if (sliderWidth === 0) sliderWidth = 300;
-
-      const maxYears = parseInt(slider.max);
-      const currentPercent = (years / maxYears) * 100;
-      const payoffPercent = (breakEvenYears / maxYears) * 100;
-      const thumbWidthPx = 20;
-      const thumbOffsetPercent = (thumbWidthPx / sliderWidth) * 100;
-      const fillEnd = Math.min(currentPercent + thumbOffsetPercent, 100);
-
-      let gradient = '';
-      if (years <= breakEvenYears) {
-        gradient = `linear-gradient(to right, var(--primary) ${fillEnd}%, #ccc ${fillEnd}%)`;
-      } else {
-        gradient = `linear-gradient(to right, 
-          var(--primary) ${payoffPercent}%, 
-          var(--surplus) ${payoffPercent}%, 
-          var(--surplus) ${fillEnd}%, 
-          #ccc ${fillEnd}%)`;
-      }
-      slider.style.background = gradient;
-
-      document.getElementById('output').innerHTML = `
-        <div class="card">
-          <h2>Assumed Cyclists</h2>
-          <p><span class="highlight">${cyclistCount.toLocaleString()}</span> regular cyclists needed to break even over ${breakEvenYears} years.</p>
-          <p class="formula"><em>Formula: Cyclist Count = Investment ÷ (Annual Savings × ${breakEvenYears})</em></p>
-        </div>
-
-        <div class="card">
-          <h2>Projected Savings over ${years} years</h2>
-          <p>Personal savings: <span class="highlight">$${totalCyclistSavings.toLocaleString()}</span></p>
-          <p>Health care savings: <span class="highlight">$${healthCareSavings.toLocaleString()}</span></p>
-          <p class="formula"><em>Formula: Personal Savings = Cyclist Count × Annual Savings × Years</em></p>
-          <p class="formula"><em>Formula: Health Care Savings = (Investment × ${multiplier} ÷ ${lifetimeYears}) × Years</em></p>
-          <p class="citation">
-            <small>
-              *Based on findings from the 
-              <a href="https://itdp.org/publication/the-case-for-cycling-infrastructure-investments/" target="_blank">CyclingMax Tool report</a> by ITDP and the World Bank, and 
-              <a href="https://cyclingmagazine.ca/sections/healthnutrition/for-these-canadian-cities-the-health-benefits-of-cycling-infrastructure-significantly-outweighed-the-cost-of-new-bike-lanes/" target="_blank">Simon Fraser University’s study</a> on Canadian cities.
-            </small>
-          </p>
-        </div>
-
-        <div class="card">
-                    <h2>Economic Return after ${years} years</h2>
-          <p>Total benefit: <span class="highlight">$${totalBenefit.toLocaleString()}</span></p>
-          <p>Net value: <span class="highlight">${netBenefit > 0 ? `$${netBenefit.toLocaleString()}` : '—'}</span></p>
-          <p>Return: <span class="highlight">${cumulativeReturn.toFixed(2)}x</span></p>
-          <p class="formula"><em>Formula: Total Benefit = Personal Savings + Health Care Savings</em></p>
-          <p class="formula"><em>Formula: Net Value = Total Benefit − Investment</em></p>
-          <p class="formula"><em>Formula: Return = Total Benefit ÷ Investment</em></p>
-        </div>
-      `;
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-      calculate();
-    });
-  </script>
 </body>
 </html>
