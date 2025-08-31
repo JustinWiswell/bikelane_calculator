@@ -198,7 +198,7 @@
     transition: background 0.3s ease-in-out;
   }
 
- input[type="range"]::-webkit-slider-thumb {
+input[type="range"]::-webkit-slider-thumb {
   appearance: none;
   width: 20px;
   height: 20px;
@@ -207,7 +207,7 @@
   cursor: pointer;
   border: none;
   box-shadow: 0 0 2px rgba(0,0,0,0.2);
-  transform: translateX(10px); /* nudges thumb right */
+  transform: translateX(calc(-50% + 10px));
 }
 
 input[type="range"]::-moz-range-thumb {
@@ -217,9 +217,8 @@ input[type="range"]::-moz-range-thumb {
   border-radius: 4px;
   cursor: pointer;
   border: none;
-  transform: translateX(10px); /* Firefox fix */
+  transform: translateX(calc(-50% + 10px));
 }
-
 
 
   .note {
