@@ -8,7 +8,6 @@
     :root {
       --primary: #2e8b57;
       --surplus: #ffc107;
-   
       --bg: #f9f9f9;
       --text: #222;
       --card: #fff;
@@ -70,16 +69,12 @@
       font-size: 0.95rem;
     }
 
-input[type="range"] {
-  width: 100%;
-  height: 20px;
-  border-radius: 10px;
-  outline: none;
-  margin: 0.5rem 0;
-}
-
-
-
+    input[type="range"] {
+      height: 20px;
+      border-radius: 10px;
+      outline: none;
+      margin: 0.5rem 0;
+    }
 
     .card {
       background: var(--card);
@@ -112,6 +107,13 @@ input[type="range"] {
       line-height: 1.2;
       font-style: italic;
     }
+    .tooltip {
+  cursor: help;
+  font-size: 0.9rem;
+  margin-left: 6px;
+  color: #888;
+}
+
 
     .citation {
       font-size: 0.75rem;
@@ -123,6 +125,16 @@ input[type="range"] {
       color: var(--primary);
       text-decoration: underline;
     }
+    .citation-ref sup a {
+  text-decoration: none;
+  color: #0078D4;
+  font-size: 0.75em;
+}
+
+.citation-ref sup a:hover {
+  text-decoration: underline;
+}
+
   </style>
 </head>
 <body>
@@ -132,9 +144,8 @@ input[type="range"] {
     <label for="investment">One-time Infrastructure Investment</label>
     <input type="text" id="investment" value="1500000" />
 
-    <label for="savings">Annual Savings per Cyclist</label>
-    <input type="text" id="savings" value="4000" />
 
+  
     <div class="slider-label">
       <label for="years">Years of Impact</label>
       <span id="year-label">5 years</span>
@@ -154,13 +165,17 @@ input[type="range"] {
     return parseFloat(value.replace(/[^\d]/g, '')) || 0;
   }
 
-  ['investment', 'savings'].forEach(id => {
-    const input = document.getElementById(id);
-    input.addEventListener('input', (e) => {
-      const raw = getRawNumber(e.target.value);
-      e.target.value = formatCurrency(raw.toString());
-      requestAnimationFrame(() => calculate());
-    });
+  window.addEventListener('DOMContentLoaded', () => {
+    const input = document.getElementById('investment');
+    const raw = input.value.replace(/[^\d]/g, '');
+    input.value = formatCurrency(raw);
+    requestAnimationFrame(() => calculate());
+  });
+
+  document.getElementById('investment').addEventListener('input', (e) => {
+    const raw = getRawNumber(e.target.value);
+    e.target.value = formatCurrency(raw.toString());
+    requestAnimationFrame(() => calculate());
   });
 
   document.getElementById('years').addEventListener('input', (e) => {
@@ -170,66 +185,83 @@ input[type="range"] {
 
   function calculate() {
     const investment = getRawNumber(document.getElementById('investment').value);
-    const savings = getRawNumber(document.getElementById('savings').value);
+    const savings = 5500; // Hardcoded based on CAA data
     const years = parseInt(document.getElementById('years').value);
 
-    const breakEvenYears = 5;
-    const multiplier = 3;
-    const lifetimeYears = 20;
-
-    const cyclistCount = Math.round(investment / (savings * breakEvenYears));
+    const healthCareSavingsPerCyclist = 300;
+    const cyclistCount = Math.ceil(investment / ((savings * years) + (healthCareSavingsPerCyclist * years)));
+    const annualBenefit = (cyclistCount * savings) + (cyclistCount * healthCareSavingsPerCyclist);
     const totalCyclistSavings = cyclistCount * savings * years;
-    const healthCareSavings = (investment * multiplier / lifetimeYears) * years;
+    const healthCareSavings = cyclistCount * healthCareSavingsPerCyclist * years;
     const totalBenefit = totalCyclistSavings + healthCareSavings;
-    const netBenefit = totalBenefit - investment;
     const cumulativeReturn = totalBenefit / investment;
+
+    // Payback period
+    let paybackYear = null;
+    let cumulative = 0;
+    for (let t = 1; t <= years; t++) {
+      cumulative += annualBenefit;
+      if (cumulative >= investment && paybackYear === null) {
+        paybackYear = t;
+      }
+    }
+
+    // Cumulative return over 5 and 20 years
+    const benefit5 = annualBenefit * 5;
+    const benefit20 = annualBenefit * 20;
 
     document.getElementById('output').innerHTML = `
       <div class="card">
-  <h2>Assumed Cyclists</h2>
-  <p>A one-time investment of <span class="highlight">$${investment.toLocaleString()}</span> in cycling infrastructure requires just <span class="highlight">${cyclistCount.toLocaleString()}</span> regular cyclists to deliver a positive ROI in ${breakEvenYears} years.</p>
-  <p class="formula"><em>Formula: Cyclist Count = Investment ÷ (Annual Savings × ${breakEvenYears})</em></p>
-</div>
+        <h2>Economic Return after ${years} years</h2>
 
+        <p>To fully offset a one-time investment of <span class="highlight">$${investment.toLocaleString()}</span> over the selected timeframe of <span class="highlight">${years} years</span>, the model estimates that the city would need to generate approximately <span class="highlight">${cyclistCount.toLocaleString()}</span> new regular cyclists — individuals who adopt cycling as a primary mode of transportation and maintain that behavior consistently throughout the period.</p>
+        <p class="formula"><em>Formula: Cyclist Count = Investment ÷ (Annual Personal Savings × Years + Annual Health Savings × Years)</em></p>
 
-    <div class="card">
-  <h2>Economic Return after ${years} years</h2>
-  <p>Personal savings: <span class="highlight">$${totalCyclistSavings.toLocaleString()}</span></p>
-  <p>Health care savings: <span class="highlight">$${healthCareSavings.toLocaleString()}</span></p>
-  <p>Total benefit: <span class="highlight">$${totalBenefit.toLocaleString()}</span></p>
-  <p>Net value: <span class="highlight">${netBenefit > 0 ? `$${netBenefit.toLocaleString()}` : '—'}</span></p>
-  <p>Return: <span class="highlight">${cumulativeReturn.toFixed(2)}x</span></p>
+        <p>These cyclists would collectively generate <span class="highlight">$${totalCyclistSavings.toLocaleString()}</span> in personal savings from avoided transportation costs, fuel, insurance, and maintenance — based on an average annual cost of <strong>$5,500</strong> to own and operate a car in New Brunswick.</p>
+        <p class="formula"><em>Formula: Personal Savings = Cyclist Count × Annual Savings × Years</em></p>
 
-  <p class="formula"><em>Formula: Personal Savings = Cyclist Count × Annual Savings × Years</em></p>
-  <p class="formula"><em>Formula: Health Care Savings = (Investment × ${multiplier} ÷ ${lifetimeYears}) × Years</em></p>
-  <p class="formula"><em>Formula: Total Benefit = Personal Savings + Health Care Savings</em></p>
-  <p class="formula"><em>Formula: Net Value = Total Benefit − Investment</em></p>
-  <p class="formula"><em>Formula: Return = Total Benefit ÷ Investment</em></p>
+        <p>In addition, public health care savings from increased physical activity contribute <span class="highlight">$${healthCareSavings.toLocaleString()}</span>, based on an estimated <span class="highlight">$300/year</span><sup><a href="#cite-health" title="See health savings source" aria-label="Health savings citation">1</a></sup> in avoided costs per cyclist.</p>
+        <p class="formula"><em>Formula: Health Savings = Cyclist Count × $300 × Years</em></p>
 
-  <p class="citation">
-    <small>
-      *Based on findings from the 
-      <a href="https://itdp.org/publication/the-case-for-cycling-infrastructure-investments/" target="_blank">CyclingMax Tool report</a> by ITDP and the World Bank, and 
-      <a href="https://cyclingmagazine.ca/sections/healthnutrition/for-these-canadian-cities-the-health-benefits-of-cycling-infrastructure-significantly-outweighed-the-cost-of-new-bike-lanes/" target="_blank">Simon Fraser University’s study</a> on Canadian cities.
-    </small>
-  </p>
-</div>
+        <p>The combined benefit over ${years} years is <span class="highlight">$${totalBenefit.toLocaleString()}</span>, generated by an estimated <span class="highlight">${cyclistCount.toLocaleString()}</span> new regular cyclists.</p>
+        <p class="formula"><em>Formula: Total Benefit = Personal Savings + Health Savings</em></p>
 
+        <p>Payback achieved in <span class="highlight">${paybackYear ? `Year ${paybackYear}` : '—'}</span>, with a return multiplier of <span class="highlight">${cumulativeReturn.toFixed(2)}x</span>.</p>
+        <p class="formula"><em>Formula: Payback = First year where cumulative benefit ≥ investment; Return = Total Benefit ÷ Investment</em></p>
+
+<p>Cumulative return:</p>
+<ul>
+  <li>💰 Payback achieved in <span class="highlight">${paybackYear ? `Year ${paybackYear}` : '—'}</span></li>
+  <li>📈 Total benefit after 10 years: <span class="highlight">$${(annualBenefit * 10).toLocaleString()}</span></li>
+  <li>📈 Total benefit after 20 years: <span class="highlight">$${(annualBenefit * 20).toLocaleString()}</span></li>
+</ul>
+<p class="formula"><em>Formula: Payback = First year where cumulative benefit ≥ investment; Cumulative Return = Annual Benefit × Years</em></p>
+
+        <p id="cite-health" class="citation">
+          <small>
+            <strong>1.</strong> Health savings estimate based on the WHO’s 
+            <a href="https://www.who.int/tools/heat-for-walking-and-cycling" target="_blank">HEAT tool</a> and Canadian modeling from 
+            <a href="https://tc.canada.ca/sites/default/files/migrated/canada_20bikes_20submission.pdf" target="_blank">Canada Bikes</a>. 
+            The <strong>$300/year</strong> figure reflects a conservative average per regular cyclist, accounting for reduced chronic disease, hospital visits, absenteeism, and premature mortality.
+          </small>
+        </p>
+
+        <p id="cite-savings" class="citation">
+          <small>
+            <strong>2.</strong> Annual car ownership cost estimate based on the <a href="https://carcosts.caa.ca/" target="_blank">CAA Driving Costs Calculator</a>, modeled for a compact vehicle in New Brunswick. Includes fuel, insurance, maintenance, depreciation, and registration.
+          </small>
+        </p>
+      </div>
     `;
   }
-
-window.addEventListener('DOMContentLoaded', () => {
-  // Format default values
-  ['investment', 'savings'].forEach(id => {
-    const input = document.getElementById(id);
-    const raw = input.value.replace(/[^\d]/g, '');
-    input.value = formatCurrency(raw);
-  });
-
-  requestAnimationFrame(() => calculate());
-});
 </script>
 
 
+
+
+
+
 </body>
-</html>
+
+
+      </html>
